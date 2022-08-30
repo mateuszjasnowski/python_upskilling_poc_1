@@ -3,8 +3,10 @@ import zipfile, os
 #import jsonify
 
 from appData import app
+from appData.feed_data import Feed
 
 
+@app.route('/', methods=['GET'])
 @app.route('/get_api_version', methods=['GET'])
 def get_api_version():
     return {'api_version': '0.0.1'}
@@ -38,3 +40,11 @@ def routes_update_routes():
     finally:
         return {'download_status': download_status, 'feed_info': file_content}
 
+@app.route('/routes/test', methods=['GET'])
+def routes_test():
+    try:
+        feed_info = Feed('./wroclaw/feed_info.txt')
+    except FileNotFoundError:
+        return {'error_message': "Cannot find file"}
+    else:
+        return {'feed_info': feed_info.is_feed_outdated()}

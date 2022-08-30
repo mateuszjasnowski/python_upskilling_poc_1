@@ -9,14 +9,14 @@ import urllib.request
 import zipfile
 import os
 
-FEED_URL = ('https://www.wroclaw.pl/open-data/'
-            '87b09b32-f076-4475-8ec9-6020ed1f9ac0/'
-            'OtwartyWroclaw_rozklad_jazdy_GTFS.zip')
+from app_data.app_constants import FEED_FILE_NAME
+
+#TODO migrate to DB as citie's feed url
 
 
 class Feed:
     ''' content of feed '''
-    def __init__(self, feed_info_file):
+    def __init__(self, feed_info_file: str):
         """feed_info_file is location of feed file"""
         with open(feed_info_file, "r", encoding='UTF-8') as feed_file:
             feed_info_lines = feed_file.read().replace('"', "").split("\n")
@@ -57,18 +57,17 @@ class Feed:
             return False
 
 
-def download_feed():
+def download_feed(feed_url: str, feed_files_location: str):
     """downloading feed from URL"""
     try:
-        print("Downloading file")
+        print("ACTION: Downloading file to {}".format(feed_files_location))
         # download file from url, save as file name
-        file_to_download = FEED_URL
-        zip_file_name = "wroclaw.zip"
-        urllib.request.urlretrieve(file_to_download, zip_file_name)
+        zip_file_name = ".temp_city.zip"
+        urllib.request.urlretrieve(feed_url, zip_file_name)
 
         # extract zip file to directory
         with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
-            zip_ref.extractall("./wroclaw/")
+            zip_ref.extractall(feed_files_location)
 
         # remove zip file
         os.remove(zip_file_name)
@@ -76,4 +75,4 @@ def download_feed():
     except:
         return "FAILED: Cannot download feed"
     else:
-        return Feed("./wroclaw/feed_info.txt")
+        return Feed(feed_files_location+'/'+FEED_FILE_NAME)

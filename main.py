@@ -9,7 +9,7 @@ from app_data.feed_data import Feed, download_feed
 from app_data import app
 
 
-def feed_checker():
+def feed_checker(): #TODO unittest
     """
     Checking if cities' feeds are up to date
     IF NOT: trying to update them
@@ -26,8 +26,10 @@ def feed_checker():
                 print(f"ERROR: {city} feed is outdated ...")
                 feed = download_feed(FEED_URL, FEED_LOCATION + city)
         finally:
-            if not feed.is_feed_outdated():
+            if type(feed) == 'Feed' and not feed.is_feed_outdated():
                 print(f"OK: {city} feed up to date ...")
+                return feed
+            return False
 
 
 def main():

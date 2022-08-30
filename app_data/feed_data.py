@@ -38,6 +38,9 @@ class Feed:
         for key, value in file_content.items():
             setattr(self, key, value)
 
+    def __repr__(self) -> str:
+        return self.__dict__
+
     def is_feed_outdated(self):
         """returns True if feed is outdated"""
         try:

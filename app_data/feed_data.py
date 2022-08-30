@@ -74,7 +74,8 @@ def download_feed(feed_url: str, feed_files_location: str):
         # remove zip file
         os.remove(zip_file_name)
 
-    except:
-        return "FAILED: Cannot download feed"
+    except Exception:
+        print("FAILED: Cannot download feed")
+        raise TimeoutError("FAILED: Cannot download feed")
     else:
         return Feed(feed_files_location + "/" + FEED_FILE_NAME)

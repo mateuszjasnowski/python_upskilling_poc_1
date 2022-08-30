@@ -1,4 +1,4 @@
-from appData import app
+from app_data import app
 
 
 def main():

@@ -2,4 +2,4 @@ from flask import Flask
 
 app = Flask(__name__)
 
-from appData import endpoints
+from app_data import endpoints

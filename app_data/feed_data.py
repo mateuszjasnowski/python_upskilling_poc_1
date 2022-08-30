@@ -10,6 +10,12 @@ import zipfile
 import os
 
 from app_data.app_constants import FEED_FILE_NAME
+from app_data.app_constants import (
+    FEED_FILE_NAME,
+    FEED_LOCATION,
+    TEMP_CITIES_LIST,
+    FEED_URL,
+)
 
 
 class Feed:
@@ -79,3 +85,32 @@ def download_feed(feed_url: str, feed_files_location: str):
         raise TimeoutError("FAILED: Cannot download feed")
     else:
         return Feed(feed_files_location + "/" + FEED_FILE_NAME)
+
+def feed_checker(): #TODO unittest
+    """
+    Checking if cities' feeds are up to date
+    IF NOT: trying to update them
+    """
+    downloaded_feeds = []
+    for city in TEMP_CITIES_LIST:
+        feed = None
+        try:
+            feed = Feed(FEED_LOCATION + city + "/" + FEED_FILE_NAME)
+        except FileNotFoundError:
+            print(f"FATAL: {city} feed not found ...")
+            feed = download_feed(FEED_URL, FEED_LOCATION + city)
+        else:
+            if feed != None and feed.is_feed_outdated():
+                print(f"ERROR: {city} feed is outdated ...")
+                feed = download_feed(FEED_URL, FEED_LOCATION + city)
+        finally:
+            if feed != None and not feed.is_feed_outdated():
+                print(f"OK: {city} feed up to date ...")
+                downloaded_feeds.append(True)
+            else:
+                downloaded_feeds.append(False)
+
+    if False in set(downloaded_feeds): #Fail if even one feed update fails
+        print(downloaded_feeds)
+        return False
+    return True

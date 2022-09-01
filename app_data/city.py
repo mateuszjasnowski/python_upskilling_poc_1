@@ -3,6 +3,7 @@ Module contains City class and all needed methods to operate with them
 """
 import os
 import shutil
+from typing import final
 import zipfile
 import urllib.request
 
@@ -26,6 +27,8 @@ class CityData:
         self.return_code = 201
 
         temp_city_dict = ".temp_city/"
+
+        #downloading
         try:
             if download_mode is True:
                 print(f"ACTION: Downloading files for {city_name} from {city_url} ...")
@@ -46,24 +49,35 @@ class CityData:
             self.return_code = 500
         else:
             # opening files
-            try:
-                with open(
-                    temp_city_dict + "routes.txt", "r", encoding="UTF-8"
-                ) as routes_file:
-                    file_lines = routes_file.read().replace('"', "").split("\n")
-                    file_columns = file_lines[0].split(",")
-                self.routes = [
-                    dict(zip(file_columns, line.split(","))) for line in file_lines[1:]
-                ]
-
-            except FileNotFoundError as not_found:
-                self.errors.append(f"Cannot open file {not_found.filename}")
+            routes_errors, self.routes = self.get_data_from_file(file_name=temp_city_dict + "routes2.txt")
+            if routes_errors != '':
+                self.errors.append(routes_errors)
                 self.return_code = 500
-            finally:
-                self.name = city_name
+
+            self.name = city_name
+        finally:
                 if download_mode is True:
                     os.remove(zip_file_name)
                     shutil.rmtree(temp_city_dict)
+
+    def get_data_from_file(self, file_name: str) -> str | list:
+        errors = ''
+        try:
+                with open(
+                    file_name, "r", encoding="UTF-8"
+                ) as routes_file:
+                    file_lines = routes_file.read().replace('"', "").split("\n")
+                    file_columns = file_lines[0].split(",")
+                file_content = [
+                    dict(zip(file_columns, line.split(","))) for line in file_lines[1:]
+                ]
+
+        except FileNotFoundError as not_found:
+            errors = f"Cannot open file {not_found.filename}"
+            file_content = 'Not avalible'
+        finally:
+            return errors, file_content
+
 
     def items(self) -> dict:
         """Returing dict with visible items"""

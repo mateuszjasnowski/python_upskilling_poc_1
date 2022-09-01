@@ -1,6 +1,12 @@
 """PoC API App for MPK data"""
 from app_data.feed_data import feed_checker
 from app_data import app
+from app_data.app_constants import (
+    FEED_FILE_NAME,
+    FEED_LOCATION,
+    TEMP_CITIES_LIST,
+    FEED_URL,
+)
 
 
 def main():
@@ -9,7 +15,7 @@ def main():
     THEN
     Starting app
     """
-    if feed_checker():
+    if feed_checker(TEMP_CITIES_LIST, FEED_LOCATION, FEED_FILE_NAME, FEED_URL):
         print("=== APP STARTING ===")
         app.run(host="127.0.0.1", debug=True)
     else:

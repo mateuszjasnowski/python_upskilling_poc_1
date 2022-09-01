@@ -10,12 +10,6 @@ import zipfile
 import os
 
 from app_data.app_constants import FEED_FILE_NAME
-from app_data.app_constants import (
-    FEED_FILE_NAME,
-    FEED_LOCATION,
-    TEMP_CITIES_LIST,
-    FEED_URL,
-)
 
 
 class Feed:
@@ -86,7 +80,7 @@ def download_feed(feed_url: str, feed_files_location: str):
     else:
         return Feed(feed_files_location + "/" + FEED_FILE_NAME)
 
-def feed_checker(): #TODO unittest
+def feed_checker(TEMP_CITIES_LIST: list, FEED_LOCATION: str, FEED_FILE_NAME: str, FEED_URL: str): #TODO unittest
     """
     Checking if cities' feeds are up to date
     IF NOT: trying to update them

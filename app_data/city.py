@@ -1,77 +1,61 @@
+'''
+Module contains City class and all needed methods to operate with them
+'''
+import os
+import shutil
+import zipfile
+import urllib.request
+
 class CityData():
-    def __init__(self, city_name: str) -> None: #, city_url: str
-        self.name = city_name
+    """CityData downloaded from web"""
+    def __init__(self, city_name: str, city_url: str, download_mode: bool = True) -> None:
+        '''
+        Download city's data from web and upload to DB
+        For city's data representation, use City class
+        Actions in __init__:
+        - try to download files
+        - unpack zip archive
+        - get needed data from files inside
+        - upload data to db
+        '''
+        self.errors = []
+        self.return_code = 201
 
         temp_city_dict = '.temp_city/'
-
-        self.routes = []
-        #opening files
         try:
-            with open(temp_city_dict+'routes.txt', 'r', encoding="UTF-8") as routes_file:
-                file_lines = routes_file.read().replace('"', "").split("\n")
-                file_columns = file_lines[0].split(",")
-            self.routes.append([dict(zip(file_columns, line.split(','))) for line in file_lines[1:]])
+            if download_mode == True:
+                print(f"ACTION: Downloading files for {city_name} from {city_url} ...")
+                zip_file_name = ".temp_city.zip"
+                temp_city_dict = '.temp_city/'
 
-        except:
-            pass
-        #else:
-            #self.routes = []
+                #download the file
+                urllib.request.urlretrieve(city_url, zip_file_name)
 
+                #unzip the file
+                with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
+                    zip_ref.extractall(temp_city_dict)
 
-        '''self.files = {}
+                # remove zip file TODO or remove zip and directory later
+                os.remove(zip_file_name)
+        except Exception:
+            self.errors.append("Cannot download feed")
+            self.return_code = 500
+        else:
+            #opening files
+            try:
+                with open(temp_city_dict+'routes.txt', 'r', encoding="UTF-8") as routes_file:
+                    file_lines = routes_file.read().replace('"', "").split("\n")
+                    file_columns = file_lines[0].split(",")
+                self.routes = [dict(zip(file_columns, line.split(','))) for line in file_lines[1:]]
 
-        for file in txt_file_list:
-            file_path = temp_city_dict + file
-            with open(file_path, 'r', encoding="UTF-8") as city_file:
-                file_lines = city_file.read().replace('"', "").split("\n")
-                file_columns = file_lines[0].split(",")
-            self.files[file.replace('.txt', '')] = {i: dict(zip(file_columns, file_lines[i].split(','))) for i in range(1, len(file_lines)) if file_lines[i] != ""}
+            except FileNotFoundError as not_found:
+                self.errors.append(f'Cannot open file {not_found.filename}')
+                self.return_code = 500
+            finally:
+                self.name = city_name
+                if download_mode == True:
+                    os.remove(zip_file_name)
+                    shutil.rmtree(temp_city_dict)
 
-            #[line for line in file_lines[1:] if line != ""]
-            dict(
-                zip(
-                    file_columns,
-                    (
-                        line
-                        for line in str(file_lines[1:])
-                        .replace("['", "")
-                        .replace("]'", "")
-                        .replace("'", "")
-                        .split(",")
-                        if line != ""
-                    ),
-                )
-            )'''
-
-
-        '''for file in txt_file_list:
-            file_path = temp_city_dict + file
-            with open(file_path, 'r', encoding="UTF-8") as city_file:
-                self.file_lines = city_file.read().replace('"', "").split("\n")
-                #file_columns = file_lines[0].split(",")
-
-            file_content = dict(
-                zip(
-                    file_columns,
-                    (
-                        line
-                        for line in str(file_lines[1:])
-                        .replace("['", "")
-                        .replace("]'", "")
-                        .replace("'", "")
-                        .split(",")
-                        if line != ""
-                    ),
-                )
-            )
-            setattr(self, file.replace('.txt',""), file_content'''
-
-
-class CityAgency():
-    def __init__(self, agency_file_location: str) -> None:
-        self.file_list = listdir()
-
-
-        with open(agency_file_location, 'r', encoding="UTF-8") as agency_file:
-            agency_file_content = agency_file.read().replace('"', "").split('\n')
-            self.agency_columns = agency_file_content[0].split(',')
+    def items(self) -> str:
+        return {'name': self.name, 'num or routes': len(self.routes)}

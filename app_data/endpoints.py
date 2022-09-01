@@ -7,35 +7,25 @@ from flask import request
 from app_data import app
 from app_data.city import CityData
 
+
+@app.route('/', methods=["GET"])
+@app.route('/version', methods=["GET"])
+def get_version():
+    return {'version': "0.0.1"}
+
 @app.route("/cities/create_city", methods=["POST"])
 def cities_create_city():
-    request_data = request.args
-    city_name = str(request_data["city_name"])
-    #city_url = str(request_data["city_url"])
+    request_data = request.headers
+    city_name = request_data.get('city_name')
+    city_url = request_data.get('city_url')
 
-    '''
-    #get city data here
-    try:
-        print(f"ACTION: Downloading files for {city_name} from {city_url} ...")
-        zip_file_name = ".temp_city.zip"
-        temp_city_dict = '.temp_city/'
-
-        #download the file
-        urllib.request.urlretrieve(city_url, zip_file_name)
-
-        #unzip the file
-        with zipfile.ZipFile(zip_file_name, "r") as zip_ref:
-            zip_ref.extractall(temp_city_dict)
-
-        # remove zip file TODO or remove zip and directory later
-        os.remove(zip_file_name)
-    except Exception:
-        print("FAILED: Cannot download feed")
-        raise TimeoutError("FAILED: Cannot download feed")
+    if request_data.get('download_mode'):
+        download_mode = request_data.get('download_mode')
     else:
-        #do next steps if downloading not fails
-        return "test"
-    '''
-    city_data = CityData(city_name=city_name)
+        download_mode = True
 
-    return {'Status': "Success", city_name: city_data.__dict__}, 201
+    city_data = CityData(city_name=city_name, city_url=city_url, download_mode=download_mode)
+    if city_data.return_code != 201:
+        return {'Status': "Failed", 'Errors': city_data.errors}, city_data.return_code
+
+    return {'Status': "Success", 'content': city_data.items()}, 201

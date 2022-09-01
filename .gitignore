@@ -1,4 +1,4 @@
 mpk_venv
-app_data/cities/
+.temp_city
+.temp_city.zip
 app_data/__pycache__/
-app_data.back

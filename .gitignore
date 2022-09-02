@@ -2,3 +2,4 @@ mpk_venv
 .temp_city
 .temp_city.zip
 app_data/__pycache__/
+unittests/__pycache__/

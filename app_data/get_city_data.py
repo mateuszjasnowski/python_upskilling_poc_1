@@ -95,9 +95,12 @@ class CityData:
             self.name = city_name
 
         finally:
-            if download_mode is True:
-                os.remove(zip_file_name)
-                shutil.rmtree(city_dir)
+            try:
+                if download_mode is True:
+                    os.remove(zip_file_name)
+                    shutil.rmtree(city_dir)
+            except FileNotFoundError as error:
+                self.errors.append(f"Cannot delete file/s {error.filename}")
 
     def items(self) -> dict:
         """Returing dict with visible items"""

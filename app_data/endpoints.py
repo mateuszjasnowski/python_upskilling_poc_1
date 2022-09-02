@@ -2,7 +2,7 @@
 from flask import request
 
 from app_data import app
-from app_data.city import CityData
+from app_data.get_city_data import CityData
 
 
 @app.route("/", methods=["GET"])

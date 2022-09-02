@@ -17,15 +17,15 @@ class FileData():
     def __init__(self, file_name):
         self.errors = ''
         try:
-                with open(
-                    file_name, "r", encoding="utf-8-sig" #BOM encoding with UTF-8
-                ) as routes_file:
-                    file_lines = routes_file.read().replace('"', "").split("\n")
-                    file_columns = file_lines[0].split(",")
-                self.file_content = [
-                    dict(zip(file_columns, line.split(","))) for line in file_lines[1:]
-                    if line != ""
-                ]
+            with open(
+                file_name, "r", encoding="utf-8-sig" #BOM encoding with UTF-8
+            ) as routes_file:
+                file_lines = routes_file.read().replace('"', "").split("\n")
+                file_columns = file_lines[0].split(",")
+            self.file_content = [
+                dict(zip(file_columns, line.split(","))) for line in file_lines[1:]
+                if line != ""
+            ]
 
         except FileNotFoundError as not_found:
             self.errors = f"Cannot open file {not_found.filename}"
@@ -89,9 +89,9 @@ class CityData:
             self.name = city_name
 
         finally:
-                if download_mode is True:
-                    os.remove(zip_file_name)
-                    shutil.rmtree(city_dir)
+            if download_mode is True:
+                os.remove(zip_file_name)
+                shutil.rmtree(city_dir)
 
     def items(self) -> dict:
         """Returing dict with visible items"""

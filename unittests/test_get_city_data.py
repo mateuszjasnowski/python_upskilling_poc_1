@@ -1,3 +1,7 @@
+'''
+Unittests for get_city_data module
+Testing FileData class and CityData class with all containing methods
+'''
 import unittest
 
 from app_data.get_city_data import FileData, CityData
@@ -43,21 +47,23 @@ class TestFileData(unittest.TestCase):
 
 
 class TestCityData(unittest.TestCase):
+    '''Testing CityData class'''
     @classmethod
-    def setUpClass(self) -> None:
+    def setUpClass(cls) -> None:
         '''Setup for class'''
-        self.download_mode = False,
-        self.city_dir = './unittests/cities_test_set/'
-        self.city_name = 'test_city'
-        self.city_url = 'http://172.0.0.1'
+        cls.download_mode = False
+        cls.city_dir = './unittests/cities_test_set/'
+        cls.city_name = 'test_city'
+        cls.city_url = 'http://172.0.0.1'
 
-        test_set_0 = self.city_dir + "test_city_0/"
-        test_set_1 = self.city_dir + "test_city_1/"
+        test_set_0 = cls.city_dir + "test_city_0/"
+        test_set_1 = cls.city_dir + "test_city_1/"
 
-        self.test_set_0 = CityData(self.city_name, self.city_url, self.download_mode, city_dir=test_set_0)
-        self.test_set_1 = CityData(self.city_name, self.city_url, self.download_mode, city_dir=test_set_1)
+        cls.test_set_0 = CityData(cls.city_name, cls.city_url, cls.download_mode, city_dir=test_set_0)
+        cls.test_set_1 = CityData(cls.city_name, cls.city_url, cls.download_mode, city_dir=test_set_1)
 
     def test_city_data_set_1(self):
+        '''Testing CityData.__init__() for data set 1'''
         city_data_object = self.test_set_1
 
         #all object parameters check
@@ -69,6 +75,7 @@ class TestCityData(unittest.TestCase):
         self.assertEqual(city_data_object.name, self.city_name)
 
     def test_city_data_set_0(self):
+        '''Testing CityData.__init__() for data set 0 (EMPTY)'''
         city_data_object = self.test_set_0
 
         self.assertTrue("No files found!" in city_data_object.errors)
@@ -78,6 +85,7 @@ class TestCityData(unittest.TestCase):
         self.assertEqual(len(city_data_object.file_list), 0)
 
     def test_city_data_items_set_1(self):
+        '''Testing .items() for data set 1'''
         city_data_object = self.test_set_1.items()
 
         self.assertEqual(type(city_data_object), dict)
@@ -88,6 +96,7 @@ class TestCityData(unittest.TestCase):
         self.assertEqual(len(city_data_object['rows in files']), 13)
 
     def test_city_data_items_set_0(self):
+        '''Testing .items() for data set 0 (empty)'''
         city_data_object = self.test_set_0.items()
 
         self.assertEqual(type(city_data_object), dict)

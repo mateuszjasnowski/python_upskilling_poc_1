@@ -3,3 +3,4 @@ mpk_venv
 .temp_city.zip
 app_data/__pycache__/
 unittests/__pycache__/
+app_data/secrets.py

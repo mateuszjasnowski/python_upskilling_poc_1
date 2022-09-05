@@ -31,7 +31,7 @@ class City(db.Model):
     agencies = db.relationship("Agency", backref="agencies", lazy=True)
 
     def __repr__(self):
-        return f"City('{self.id}', '{self.city_name}', '{self.feed_publisher_name}', '{self.feed_publisher_url}', '{self.feed_lang}', '{self.feed_start_date}', '{self.feed_end_date}')"
+        return f"City('{self.city_id}', '{self.city_name}', '{self.feed_publisher_name}', '{self.feed_publisher_url}', '{self.feed_lang}', '{self.feed_start_date}', '{self.feed_end_date}')"
 
 
 class Agency(db.Model):

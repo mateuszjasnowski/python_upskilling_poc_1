@@ -1,8 +1,11 @@
 """Endpoint for api"""
+from sqlite3 import IntegrityError
 from flask import request
+from sqlalchemy import exc
 
-from app_data import app
+from app_data import app, db
 from app_data.get_city_data import CityData
+import app_data.city
 
 
 @app.route("/", methods=["GET"])
@@ -33,5 +36,41 @@ def cities_create_city():
     )
     if city_data.return_code != 201:
         return {"Status": "Failed", "Errors": city_data.errors}, city_data.return_code
+
+    db_city = app_data.city.City.query.filter_by(city_name=city_name).first()
+    if db_city:
+        city_id = db_city.city_id
+    else:
+        new_city = app_data.city.City(
+            city_name=city_name,
+            feed_publisher_name = city_data.feed_info[0]['feed_publisher_name'],
+            feed_publisher_url = city_data.feed_info[0]['feed_publisher_url'],
+            feed_lang = city_data.feed_info[0]['feed_lang'],
+            feed_start_date = city_data.feed_info[0]['feed_start_date'],
+            feed_end_date = city_data.feed_info[0]['feed_end_date'],
+            )
+        #try: TODO
+        db.session.add(new_city)
+        db.session.commit()
+        city_id = app_data.city.City.query.filter_by(city_name=city_name).first().city_id
+
+    for agency in city_data.agency:
+        new_agency = app_data.city.Agency(
+            city_id = city_id,
+            agency_id = agency['agency_id'],
+            agency_name = agency['agency_name'],
+            agency_url = agency['agency_url'],
+            agency_timezone = agency['agency_timezone'],
+            agency_phone = agency['agency_phone'],
+            agency_lang = agency['agency_lang']
+            )
+        try:
+            db.session.add(new_agency)
+            db.session.commit()
+        except exc.IntegrityError:
+            db.session.rollback()
+            print(f'ERROR: agency with id {new_agency.agency_id} already exists, skipping!')
+
+    #TODO move loops to get_city_data module
 
     return {"Status": "Success", "content": city_data.items()}, 201

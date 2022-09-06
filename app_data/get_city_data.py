@@ -259,6 +259,10 @@ class CityData:
             db.session.add(vehicle_type)
 
         db.session.commit()  # commit to 1st-layer tables
+        inserted_rows = sum(len(agencies), len(calendars),
+            len(route_types), len(stops),
+            len(variants), len(vehicle_types))
+        print(f'ACTION: inserting {inserted_rows} rows to 6 tables')
 
         for control_stop in control_stops:
             db.session.add(control_stop)
@@ -267,17 +271,21 @@ class CityData:
             db.session.add(route)
 
         db.session.commit()  # commit to 2nd-layer tables
+        inserted_rows = sum(len(control_stops), len(routes))
+        print(f'ACTION: inserting {inserted_rows} rows to 2 tables')
 
         for trip in trips:
             db.session.add(trip)
 
         db.session.commit()  # commit to 3nd-layer tables
+        print(f'ACTION: inserting {len(trips)} rows to 1 table')
 
         for stop_time in stop_times:
             db.session.add(stop_time)
 
         # try:
         db.session.commit()  # commit to 4th-layer tables
+        print(f'ACTION: inserting {len(stop_times)} rows to 1 table')
         # except exc.IntegrityError as ie:
         #        db.session.rollback()
         #        if ie.orig  and len(str(ie.orig).split('\n')) > 1:

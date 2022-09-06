@@ -12,7 +12,7 @@ Stop_times
 Stops
 Trips
 Variants
-Vechicle_types
+vehicle_types
 """
 from app_data import db
 
@@ -34,7 +34,7 @@ class City(db.Model):
         return f"City('{self.city_id}', '{self.city_name}', '{self.feed_publisher_name}', '{self.feed_publisher_url}', '{self.feed_lang}', '{self.feed_start_date}', '{self.feed_end_date}')"
 
 
-class Agency(db.Model):
+class Agency(db.Model): #1-layer
     """agency table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -45,10 +45,7 @@ class Agency(db.Model):
     agency_phone = db.Column(db.String())
     agency_lang = db.Column(db.String())
 
-    # TODO __repr__
-
-
-class Calendar(db.Model):
+class Calendar(db.Model): #1-layer
     """calendar table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -64,15 +61,16 @@ class Calendar(db.Model):
     end_date = db.Column(db.DateTime)
 
 
-class ControlStop(db.Model):
+class ControlStop(db.Model): #2-layer
     """control_stop table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
-    variant_id = db.Column(db.Integer, primary_key=True)
-    stop_id = db.Column(db.Integer, db.ForeignKey("stop.stop_id"), nullable=False)
+    control_stop_id = db.Column(db.Integer, primary_key=True)
+    variant_id = db.Column(db.Integer, db.ForeignKey("variant.variant_id"))
+    stop_id = db.Column(db.Integer, db.ForeignKey("stop.stop_id"))
 
 
-class RouteType2(db.Model):
+class RouteType2(db.Model): #1-layer
     """route_type2 table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -83,7 +81,7 @@ class RouteType2(db.Model):
         return f"RouteType2('{self.city_id.city_name}', '{self.route_type2_id}', '{self.route_type2_name}'"
 
 
-class Route(db.Model):
+class Route(db.Model): #2-layer
     """route table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -100,7 +98,7 @@ class Route(db.Model):
     valid_until = db.Column(db.DateTime)
 
 
-class StopTime(db.Model):
+class StopTime(db.Model): # 4th layer
     """stop_time table"""
 
     stop_time_id = db.Column(db.Integer, primary_key=True)
@@ -114,7 +112,7 @@ class StopTime(db.Model):
     drop_off_type = db.Column(db.Integer)
 
 
-class Stop(db.Model):
+class Stop(db.Model): #1-layer
     """stop table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -125,7 +123,7 @@ class Stop(db.Model):
     stop_lon = db.Column(db.String())
 
 
-class Trip(db.Model):
+class Trip(db.Model): #3rd layer
     """trip table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -137,16 +135,16 @@ class Trip(db.Model):
     trip_headsign = db.Column(db.String())
     direction_id = db.Column(db.Integer)
     shape_id = db.Column(db.Integer)  # not integrarting shapes
-    brigade_id = db.Column(db.Integer)
-    vechicle = db.Column(
-        db.Integer, db.ForeignKey("vechicle_type.vehicle_type_id"), nullable=False
+    brigade_id = db.Column(db.String())
+    vehicle = db.Column(
+        db.Integer, db.ForeignKey("vehicle_type.vehicle_type_id")
     )
     variant_id = db.Column(
         db.Integer, db.ForeignKey("variant.variant_id"), nullable=False
     )
 
 
-class Variant(db.Model):
+class Variant(db.Model): #1-layer
     """variant table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -157,8 +155,8 @@ class Variant(db.Model):
     disjoin_stop_id = db.Column(db.Integer)
 
 
-class VechicleType(db.Model):
-    """vechicle_type table"""
+class VehicleType(db.Model): #1-layer
+    """vehicle_type table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
     vehicle_type_id = db.Column(db.Integer, primary_key=True)

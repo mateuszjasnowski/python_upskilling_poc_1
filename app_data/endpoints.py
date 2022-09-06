@@ -1,7 +1,7 @@
 """Endpoint for api"""
-from sqlite3 import IntegrityError
 from flask import request
 from sqlalchemy import exc
+from datetime import datetime
 
 from app_data import app, db
 from app_data.get_city_data import CityData
@@ -46,30 +46,21 @@ def cities_create_city():
             feed_publisher_name = city_data.feed_info[0]['feed_publisher_name'],
             feed_publisher_url = city_data.feed_info[0]['feed_publisher_url'],
             feed_lang = city_data.feed_info[0]['feed_lang'],
-            feed_start_date = city_data.feed_info[0]['feed_start_date'],
-            feed_end_date = city_data.feed_info[0]['feed_end_date'],
-            )
-        #try: TODO
-        db.session.add(new_city)
-        db.session.commit()
-        city_id = app_data.city.City.query.filter_by(city_name=city_name).first().city_id
-
-    for agency in city_data.agency:
-        new_agency = app_data.city.Agency(
-            city_id = city_id,
-            agency_id = agency['agency_id'],
-            agency_name = agency['agency_name'],
-            agency_url = agency['agency_url'],
-            agency_timezone = agency['agency_timezone'],
-            agency_phone = agency['agency_phone'],
-            agency_lang = agency['agency_lang']
+            feed_start_date = datetime.strptime(city_data.feed_info[0]['feed_start_date'], '%Y%m%d'),
+            feed_end_date = datetime.strptime(city_data.feed_info[0]['feed_end_date'], '%Y%m%d'),
             )
         try:
-            db.session.add(new_agency)
+            db.session.add(new_city)
             db.session.commit()
-        except exc.IntegrityError:
+        except exc.IntegrityError as ie:
             db.session.rollback()
-            print(f'ERROR: agency with id {new_agency.agency_id} already exists, skipping!')
+            if ie.orig  and len(str(ie.orig).split('\n')) > 1:
+                print(str(ie.orig).split('\n')[1])
+        else:
+            city_id = app_data.city.City.query.filter_by(city_name=city_name).first().city_id
+
+    #inset to db
+    city_data.insert_to_db(city_id)
 
     #TODO move loops to get_city_data module
 

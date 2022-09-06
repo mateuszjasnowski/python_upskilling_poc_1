@@ -31,10 +31,13 @@ class City(db.Model):
     agencies = db.relationship("Agency", backref="agencies", lazy=True)
 
     def __repr__(self):
-        return f"City('{self.city_id}', '{self.city_name}', '{self.feed_publisher_name}', '{self.feed_publisher_url}', '{self.feed_lang}', '{self.feed_start_date}', '{self.feed_end_date}')"
+        return f"City('{self.city_id}', \
+            '{self.city_name}', '{self.feed_publisher_name}',\
+            '{self.feed_publisher_url}', '{self.feed_lang}',\
+            '{self.feed_start_date}', '{self.feed_end_date}')"
 
 
-class Agency(db.Model): #1-layer
+class Agency(db.Model):  # 1-layer
     """agency table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -45,7 +48,8 @@ class Agency(db.Model): #1-layer
     agency_phone = db.Column(db.String())
     agency_lang = db.Column(db.String())
 
-class Calendar(db.Model): #1-layer
+
+class Calendar(db.Model):  # 1-layer
     """calendar table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -61,7 +65,7 @@ class Calendar(db.Model): #1-layer
     end_date = db.Column(db.DateTime)
 
 
-class ControlStop(db.Model): #2-layer
+class ControlStop(db.Model):  # 2-layer
     """control_stop table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -70,7 +74,7 @@ class ControlStop(db.Model): #2-layer
     stop_id = db.Column(db.Integer, db.ForeignKey("stop.stop_id"))
 
 
-class RouteType2(db.Model): #1-layer
+class RouteType2(db.Model):  # 1-layer
     """route_type2 table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -78,10 +82,11 @@ class RouteType2(db.Model): #1-layer
     route_type2_name = db.Column(db.String())
 
     def __repr__(self) -> str:
-        return f"RouteType2('{self.city_id.city_name}', '{self.route_type2_id}', '{self.route_type2_name}'"
+        return f"RouteType2('{self.city_id.city_name}', \
+            '{self.route_type2_id}', '{self.route_type2_name}'"
 
 
-class Route(db.Model): #2-layer
+class Route(db.Model):  # 2-layer
     """route table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -98,7 +103,7 @@ class Route(db.Model): #2-layer
     valid_until = db.Column(db.DateTime)
 
 
-class StopTime(db.Model): # 4th layer
+class StopTime(db.Model):  # 4th layer
     """stop_time table"""
 
     stop_time_id = db.Column(db.Integer, primary_key=True)
@@ -112,7 +117,7 @@ class StopTime(db.Model): # 4th layer
     drop_off_type = db.Column(db.Integer)
 
 
-class Stop(db.Model): #1-layer
+class Stop(db.Model):  # 1-layer
     """stop table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -123,7 +128,7 @@ class Stop(db.Model): #1-layer
     stop_lon = db.Column(db.String())
 
 
-class Trip(db.Model): #3rd layer
+class Trip(db.Model):  # 3rd layer
     """trip table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -136,15 +141,13 @@ class Trip(db.Model): #3rd layer
     direction_id = db.Column(db.Integer)
     shape_id = db.Column(db.Integer)  # not integrarting shapes
     brigade_id = db.Column(db.String())
-    vehicle = db.Column(
-        db.Integer, db.ForeignKey("vehicle_type.vehicle_type_id")
-    )
+    vehicle = db.Column(db.Integer, db.ForeignKey("vehicle_type.vehicle_type_id"))
     variant_id = db.Column(
         db.Integer, db.ForeignKey("variant.variant_id"), nullable=False
     )
 
 
-class Variant(db.Model): #1-layer
+class Variant(db.Model):  # 1-layer
     """variant table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
@@ -155,7 +158,7 @@ class Variant(db.Model): #1-layer
     disjoin_stop_id = db.Column(db.Integer)
 
 
-class VehicleType(db.Model): #1-layer
+class VehicleType(db.Model):  # 1-layer
     """vehicle_type table"""
 
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)

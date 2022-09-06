@@ -1,4 +1,7 @@
 black
+pylint
 flask
 flask_sqlalchemy
 psycopg2-binary
+pylint-flask-sqlalchemy
+pylint-flask

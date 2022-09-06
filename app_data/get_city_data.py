@@ -110,126 +110,132 @@ class CityData:
         """Inserting cities' attributes to db"""
         agencies = [
             app_data.city.Agency(
-                city_id = city_id,
-                agency_id = agency['agency_id'],
-                agency_name = agency['agency_name'],
-                agency_url = agency['agency_url'],
-                agency_timezone = agency['agency_timezone'],
-                agency_phone = agency['agency_phone'],
-                agency_lang = agency['agency_lang']
-                )
+                city_id=city_id,
+                agency_id=agency["agency_id"],
+                agency_name=agency["agency_name"],
+                agency_url=agency["agency_url"],
+                agency_timezone=agency["agency_timezone"],
+                agency_phone=agency["agency_phone"],
+                agency_lang=agency["agency_lang"],
+            )
             for agency in self.agency
         ]
 
         stops = [
             app_data.city.Stop(
-                city_id = city_id,
-                stop_id = stop['stop_id'],
-                stop_code = stop['stop_code'],
-                stop_name = stop['stop_name'],
-                stop_lat = stop['stop_lat'],
-                stop_lon = stop['stop_lon'],
+                city_id=city_id,
+                stop_id=stop["stop_id"],
+                stop_code=stop["stop_code"],
+                stop_name=stop["stop_name"],
+                stop_lat=stop["stop_lat"],
+                stop_lon=stop["stop_lon"],
             )
             for stop in self.stops
         ]
 
         calendars = [
             app_data.city.Calendar(
-                city_id = city_id,
-                service_id = calendar['service_id'],
-                monday = calendar['monday'],
-                tuesday = calendar['tuesday'],
-                wednesday = calendar['wednesday'],
-                thursday = calendar['thursday'],
-                friday = calendar['friday'],
-                saturday = calendar['saturday'],
-                sunday = calendar['sunday'],
-                start_date = datetime.strptime(calendar['start_date'], '%Y%m%d'),
-                end_date = datetime.strptime(calendar['end_date'], '%Y%m%d')
+                city_id=city_id,
+                service_id=calendar["service_id"],
+                monday=calendar["monday"],
+                tuesday=calendar["tuesday"],
+                wednesday=calendar["wednesday"],
+                thursday=calendar["thursday"],
+                friday=calendar["friday"],
+                saturday=calendar["saturday"],
+                sunday=calendar["sunday"],
+                start_date=datetime.strptime(calendar["start_date"], "%Y%m%d"),
+                end_date=datetime.strptime(calendar["end_date"], "%Y%m%d"),
             )
             for calendar in self.calendar
         ]
 
         control_stops = [
             app_data.city.ControlStop(
-                city_id = city_id,
-                variant_id = control_stop['variant_id'],
-                stop_id = control_stop['stop_id']
+                city_id=city_id,
+                variant_id=control_stop["variant_id"],
+                stop_id=control_stop["stop_id"],
             )
             for control_stop in self.control_stops
         ]
 
         route_types = [
             app_data.city.RouteType2(
-                city_id = city_id,
-                route_type2_id = route_type['route_type2_id'],
-                route_type2_name = route_type['route_type2_name']
+                city_id=city_id,
+                route_type2_id=route_type["route_type2_id"],
+                route_type2_name=route_type["route_type2_name"],
             )
             for route_type in self.route_types
         ]
 
         routes = [
             app_data.city.Route(
-                city_id = city_id,
-                route_id = route['route_id'],
-                agency_id = route['agency_id'],
-                route_short_name = route['route_short_name'],
-                route_long_name = route['route_long_name'],
-                route_desc = route['route_desc'],
-                route_type = route['route_type'],
-                route_type2_id = route['route_type2_id'],
-                valid_from = datetime.strptime(route['valid_from'], '%Y-%m-%d'),
-                valid_until = datetime.strptime(route['valid_until'], '%Y-%m-%d')
+                city_id=city_id,
+                route_id=route["route_id"],
+                agency_id=route["agency_id"],
+                route_short_name=route["route_short_name"],
+                route_long_name=route["route_long_name"],
+                route_desc=route["route_desc"],
+                route_type=route["route_type"],
+                route_type2_id=route["route_type2_id"],
+                valid_from=datetime.strptime(route["valid_from"], "%Y-%m-%d"),
+                valid_until=datetime.strptime(route["valid_until"], "%Y-%m-%d"),
             )
             for route in self.routes
         ]
 
-        time_convert = lambda time: f"{str(int(time.split(':')[0])%24)}:{time.split(':')[1]}:{time.split(':')[2]}"
+        time_convert = (
+            lambda t: f"{str(int(t.split(':')[0])%24)}:{t.split(':')[1]}:{t.split(':')[2]}"
+        )
         stop_times = [
             app_data.city.StopTime(
-                city_id = city_id,
-                trip_id = str(stop_time["trip_id"]),
-                arrival_time = datetime.strptime(time_convert(stop_time["arrival_time"]), '%H:%M:%S').time(),
-                departure_time = datetime.strptime(time_convert(stop_time["departure_time"]), '%H:%M:%S').time(),
-                stop_id = stop_time["stop_id"],
-                stop_sequence = stop_time["stop_sequence"],
-                pickup_type = stop_time["pickup_type"],
-                drop_off_type = stop_time["drop_off_type"]
+                city_id=city_id,
+                trip_id=str(stop_time["trip_id"]),
+                arrival_time=datetime.strptime(
+                    time_convert(stop_time["arrival_time"]), "%H:%M:%S"
+                ).time(),
+                departure_time=datetime.strptime(
+                    time_convert(stop_time["departure_time"]), "%H:%M:%S"
+                ).time(),
+                stop_id=stop_time["stop_id"],
+                stop_sequence=stop_time["stop_sequence"],
+                pickup_type=stop_time["pickup_type"],
+                drop_off_type=stop_time["drop_off_type"],
             )
             for stop_time in self.stop_times
-            ]
+        ]
 
         variants = [
             app_data.city.Variant(
-                city_id = city_id,
-                variant_id = variant['variant_id'],
-                is_main = variant['is_main'],
+                city_id=city_id,
+                variant_id=variant["variant_id"],
+                is_main=variant["is_main"],
             )
             for variant in self.variants
         ]
 
         vehicle_types = [
             app_data.city.VehicleType(
-                city_id = city_id,
-                vehicle_type_id = vehicle_type['vehicle_type_id'],
-                vehicle_type_name = vehicle_type['vehicle_type_name'],
-                vehicle_type_description = vehicle_type['vehicle_type_description'],
-                vehicle_type_symbol = vehicle_type['vehicle_type_symbol']
+                city_id=city_id,
+                vehicle_type_id=vehicle_type["vehicle_type_id"],
+                vehicle_type_name=vehicle_type["vehicle_type_name"],
+                vehicle_type_description=vehicle_type["vehicle_type_description"],
+                vehicle_type_symbol=vehicle_type["vehicle_type_symbol"],
             )
             for vehicle_type in self.vehicle_types
         ]
 
         trips = [
             app_data.city.Trip(
-                city_id = city_id,
-                route_id = trip['route_id'],
-                service_id = trip['service_id'],
-                trip_id = trip['trip_id'],
-                trip_headsign = trip['trip_headsign'],
-                direction_id = trip['direction_id'],
-                shape_id = trip['shape_id'],
-                brigade_id = trip['brigade_id'],
-                variant_id = trip['variant_id']
+                city_id=city_id,
+                route_id=trip["route_id"],
+                service_id=trip["service_id"],
+                trip_id=trip["trip_id"],
+                trip_headsign=trip["trip_headsign"],
+                direction_id=trip["direction_id"],
+                shape_id=trip["shape_id"],
+                brigade_id=trip["brigade_id"],
+                variant_id=trip["variant_id"],
             )
             for trip in self.trips
         ]
@@ -252,7 +258,7 @@ class CityData:
         for vehicle_type in vehicle_types:
             db.session.add(vehicle_type)
 
-        db.session.commit() #commit to 1st-layer tables
+        db.session.commit()  # commit to 1st-layer tables
 
         for control_stop in control_stops:
             db.session.add(control_stop)
@@ -260,25 +266,25 @@ class CityData:
         for route in routes:
             db.session.add(route)
 
-        db.session.commit() #commit to 2nd-layer tables
+        db.session.commit()  # commit to 2nd-layer tables
 
         for trip in trips:
             db.session.add(trip)
 
-        db.session.commit() #commit to 3nd-layer tables
-
+        db.session.commit()  # commit to 3nd-layer tables
 
         for stop_time in stop_times:
             db.session.add(stop_time)
 
-        """try:"""
-        db.session.commit() #commit to 4th-layer tables
-        """except exc.IntegrityError as ie:
-                db.session.rollback()
-                if ie.orig  and len(str(ie.orig).split('\n')) > 1:
-                    print(str(ie.orig).split('\n')[1])
-                else:
-                    print(f'ERROR: cannot insert row with id {new_row.service_id}, skipping!')"""
+        # try:
+        db.session.commit()  # commit to 4th-layer tables
+        # except exc.IntegrityError as ie:
+        #        db.session.rollback()
+        #        if ie.orig  and len(str(ie.orig).split('\n')) > 1:
+        #            print(str(ie.orig).split('\n')[1])
+        #        else:
+        #            print(f'ERROR: cannot insert row with id {new_row.service_id}, skipping!')
+        return True
 
     def items(self) -> dict:
         """Returing dict with visible items"""

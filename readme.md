@@ -4,7 +4,7 @@
 #0.0.2 - Geting city data from URL
 #0.0.3 - Geting data from DB
 #0.0.4 - Uploading data to DB
-#0.1.0 - GET cities <b>[HERE]</b>
+#0.1.0 - GET cities [HERE]
 #0.1.1 - GET routes-wroclaw
 #0.1.2 - ?
 #0.2.0 - ?

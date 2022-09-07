@@ -32,15 +32,30 @@ def get_city():
     or
     {"city": {{"city_id": id, "city_name": name}}}
     """
+    error = ''
+    error_val = ''
 
     if "city_id" in request.args:
         get_city_id = request.args.get("city_id")
         db_get_city = City.query.filter_by(city_id=get_city_id).first()
+        error = 'id'
+        error_val = get_city_id
+
     elif "city_name" in request.args:
         get_city_name = request.args.get("city_name")
         db_get_city = City.query.filter_by(city_name=get_city_name).first()
+        error = 'name'
+        error_val = get_city_name
+
     else:
         db_get_city = City.query.all()
+        ""
+
+    if not db_get_city:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any city {error} = {error_val}"
+        }, 404
 
     if isinstance(db_get_city, list):
         return {
@@ -72,6 +87,17 @@ def get_routes():
 
     db_get_city = City.query.filter_by(city_id=get_city_id).first()
     db_get_routes = Route.query.filter_by(city_id=get_city_id).all()
+
+    if not db_get_city:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any city with id {get_city_id}"
+        }, 404
+    if not db_get_routes:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any route for city with id {get_city_id}"
+        }, 404
 
     return {
         "city": db_get_city.city_name,

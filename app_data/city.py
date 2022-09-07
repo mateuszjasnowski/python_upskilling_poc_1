@@ -100,6 +100,17 @@ class Route(db.Model):  # 2-layer
     valid_from = db.Column(db.DateTime)
     valid_until = db.Column(db.DateTime)
 
+    def get_dict(self) -> dict:
+        """returning dict with object's attributes"""
+        return {
+            "route_id": self.route_id,
+            "route_desc": self.route_desc,
+            "route_short_name": self.route_short_name
+        }
+
+    def __repr__(self) -> str:
+        return f"Route('{self.route_id}', '{self.route_desc}')"
+
 
 class StopTime(db.Model):  # 4th layer
     """stop_time table"""

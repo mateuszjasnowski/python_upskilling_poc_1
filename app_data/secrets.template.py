@@ -3,7 +3,7 @@ Secrets and constants for app
 TEMPLATE FILE
 """
 #API
-API_VERSION = "0.1.0"
+API_VERSION = "0.1.1"
 API_URL = "XXX.XXX.XXX.XXX"
 
 #DATABASE

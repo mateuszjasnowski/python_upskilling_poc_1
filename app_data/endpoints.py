@@ -8,7 +8,7 @@ from sqlalchemy import exc
 from app_data.secrets import API_VERSION
 from app_data import app, db
 from app_data.get_city_data import CityData
-from app_data.city import City
+from app_data.city import City, Route
 
 
 @app.route("/", methods=["GET"])
@@ -56,8 +56,27 @@ def get_city():
 
 @app.route("/routes", methods=["GET"])
 def get_routes():
-    """TODO"""
-    return "GET: /routes"
+    """
+    API ENDPOINT
+    Reciving:
+    city_id (*)
+    (*) - Required
+
+    Returning:
+    {"city": name, "routes": [{<route> #TODO}, {...}]}
+    """
+
+    if 'city_id' not in request.args:
+        return {'Status': 'FAILED', 'Error': 'Not given city_id parameter'}, 402
+    get_city_id = request.args.get("city_id")
+
+    db_get_city = City.query.filter_by(city_id=get_city_id).first()
+    db_get_routes = Route.query.filter_by(city_id=get_city_id).all()
+
+    return {
+        "city": db_get_city.city_name,
+        "routes": [route.get_dict() for route in db_get_routes]
+    }
 
 
 @app.route("/city/create", methods=["POST"])

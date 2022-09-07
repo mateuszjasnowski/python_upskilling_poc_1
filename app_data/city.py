@@ -29,8 +29,6 @@ class City(db.Model):
     feed_start_date = db.Column(db.DateTime)
     feed_end_date = db.Column(db.DateTime)
 
-    agencies = db.relationship("Agency", backref="agencies", lazy=True)
-
     def __repr__(self):
         return f"City('{self.city_id}', '{self.city_name}')"
 
@@ -45,6 +43,8 @@ class Agency(db.Model):  # 1-layer
     agency_timezone = db.Column(db.String())
     agency_phone = db.Column(db.String())
     agency_lang = db.Column(db.String())
+
+    city = db.relationship("City", backref="city", lazy=True)
 
 
 class Calendar(db.Model):  # 1-layer
@@ -62,6 +62,8 @@ class Calendar(db.Model):  # 1-layer
     start_date = db.Column(db.DateTime)
     end_date = db.Column(db.DateTime)
 
+    city = db.relationship("City", backref="city", lazy=True)
+
 
 class ControlStop(db.Model):  # 2-layer
     """control_stop table"""
@@ -71,6 +73,10 @@ class ControlStop(db.Model):  # 2-layer
     variant_id = db.Column(db.Integer, db.ForeignKey("variant.variant_id"))
     stop_id = db.Column(db.Integer, db.ForeignKey("stop.stop_id"))
 
+    city = db.relationship("City", backref="city", lazy=True)
+    variant = db.relationship("Variant", backref="variant", lazy=True)
+    stop = db.relationship("Stop", backref="stop", lazy=True)
+
 
 class RouteType2(db.Model):  # 1-layer
     """route_type2 table"""
@@ -78,6 +84,8 @@ class RouteType2(db.Model):  # 1-layer
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
     route_type2_id = db.Column(db.Integer, primary_key=True)
     route_type2_name = db.Column(db.String())
+
+    city = db.relationship("City", backref="city", lazy=True)
 
     def __repr__(self) -> str:
         return f"RouteType2('{self.city_id.city_name}', \
@@ -100,12 +108,18 @@ class Route(db.Model):  # 2-layer
     valid_from = db.Column(db.DateTime)
     valid_until = db.Column(db.DateTime)
 
+    agency = db.relationship("Agency", backref="agency", lazy=True)
+    city = db.relationship("City", backref="city", lazy=True)
+    route_type2 = db.relationship("RouteType2", backref="route_type2", lazy=True)
+
     def get_dict(self) -> dict:
         """returning dict with object's attributes"""
         return {
             "route_id": self.route_id,
             "route_desc": self.route_desc,
-            "route_short_name": self.route_short_name
+            "route_short_name": self.route_short_name,
+            "agency": self.agency.agency_name,
+            "route_type2": self.route_type2.route_type2_name
         }
 
     def __repr__(self) -> str:
@@ -125,6 +139,10 @@ class StopTime(db.Model):  # 4th layer
     pickup_type = db.Column(db.Integer)
     drop_off_type = db.Column(db.Integer)
 
+    city = db.relationship("City", backref="city", lazy=True)
+    trip = db.relationship("Trip", backref="trip", lazy=True)
+    stop = db.relationship("Stop", backref="stop", lazy=True)
+
 
 class Stop(db.Model):  # 1-layer
     """stop table"""
@@ -135,6 +153,8 @@ class Stop(db.Model):  # 1-layer
     stop_name = db.Column(db.String())
     stop_lat = db.Column(db.String())
     stop_lon = db.Column(db.String())
+
+    city = db.relationship("City", backref="city", lazy=True)
 
 
 class Trip(db.Model):  # 3rd layer
@@ -155,6 +175,11 @@ class Trip(db.Model):  # 3rd layer
         db.Integer, db.ForeignKey("variant.variant_id"), nullable=False
     )
 
+    city = db.relationship("City", backref="city", lazy=True)
+    route = db.relationship("Route", backref="route", lazy=True)
+    service = db.relationship("Calendar", backref="service", lazy=True)
+    vehicle_data = db.relationship("VeicleType", backref="vehicle_data", lazy=True)
+    variant = db.relationship("Variant", backref="variant", lazy=True)
 
 class Variant(db.Model):  # 1-layer
     """variant table"""
@@ -166,6 +191,8 @@ class Variant(db.Model):  # 1-layer
     join_stop_id = db.Column(db.Integer)
     disjoin_stop_id = db.Column(db.Integer)
 
+    city = db.relationship("City", backref="city", lazy=True)
+
 
 class VehicleType(db.Model):  # 1-layer
     """vehicle_type table"""
@@ -175,3 +202,5 @@ class VehicleType(db.Model):  # 1-layer
     vehicle_type_name = db.Column(db.String())
     vehicle_type_description = db.Column(db.String())
     vehicle_type_symbol = db.Column(db.String())
+
+    city = db.relationship("City", backref="city", lazy=True)

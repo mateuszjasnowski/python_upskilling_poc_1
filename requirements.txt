@@ -1,3 +1,4 @@
+pip
 black
 pylint
 flask

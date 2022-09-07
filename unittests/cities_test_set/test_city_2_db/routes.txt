@@ -1,0 +1,2 @@
+﻿route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_type2_id,valid_from,valid_until
+test_route,901,"test_route_name","long_name","Route START - ROUTE END - ROUTE START",999,999,"2022-08-27","2999-01-01"

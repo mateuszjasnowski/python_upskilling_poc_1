@@ -1,0 +1,2 @@
+﻿variant_id,is_main,equiv_main_variant_id,join_stop_id,disjoin_stop_id
+9000001,0,,,

@@ -1,0 +1,2 @@
+﻿stop_id,stop_code,stop_name,stop_lat,stop_lon
+90001,test_code,"ROUTE START",51.0769998000,17.0844074000

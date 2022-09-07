@@ -1,3 +1,4 @@
+# pylint: disable=E1101, R0903
 """
 Module contains db classes for tables:
 City - indicating city

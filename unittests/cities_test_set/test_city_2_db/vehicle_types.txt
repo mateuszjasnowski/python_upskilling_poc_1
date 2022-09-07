@@ -1,0 +1,2 @@
+﻿vehicle_type_id,vehicle_type_name,vehicle_type_description,vehicle_type_symbol
+9001,"test_type","","S"

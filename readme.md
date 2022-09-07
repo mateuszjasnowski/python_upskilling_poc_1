@@ -6,8 +6,9 @@
 #0.0.4 - Uploading data to DB
 #0.1.0 - GET cities
 #0.1.1 - GET routes-wroclaw [HERE]
-#0.1.2 - ?
-#0.2.0 - ?
+#0.1.2 - PoC 1 code review
+#0.2.0 - PoC 2 TODO
+#0.2.1 - ?
 ```
 
 ## Used technologies

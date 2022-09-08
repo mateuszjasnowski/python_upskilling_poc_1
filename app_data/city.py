@@ -8,7 +8,7 @@ Calendar_dates #MISS THAT
 Control_stops
 Route_types
 Routes
-Shapes #MISS
+Shapes
 Stop_times
 Stops
 Trips
@@ -39,6 +39,7 @@ class City(db.Model):
     trips = db.relationship("Trip", backref="city", lazy=True)
     variants = db.relationship("Variant", backref="city", lazy=True)
     vehicle_types = db.relationship("VehicleType", backref="city", lazy=True)
+    shapes = db.relationship("Shape", backref="city", lazy=True)
 
     def __repr__(self):
         return f"City('{self.city_id}', '{self.city_name}')"
@@ -132,6 +133,19 @@ class Route(db.Model):  # 2-layer
         return f"Route('{self.route_id}', '{self.route_desc}')"
 
 
+class Shape(db.Model): # 1st layer
+    """shape table"""
+    point_id = db.Column(db.Integer, primary_key=True)
+    city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
+    shape_id = db.Column(db.Integer)
+    shape_pt_lat = db.Column(db.String)
+    shape_pt_lon = db.Column(db.String)
+    shape_pt_sequence = db.Column(db.Integer)
+
+    def __repr__(self) -> str:
+        return f"Shape('{self.shape_id}', '{self.shape_pt_lat},{self.shape_pt_lon}', '{self.shape_pt_sequence})"
+
+
 class StopTime(db.Model):  # 4th layer
     """stop_time table"""
 
@@ -171,7 +185,7 @@ class Trip(db.Model):  # 3rd layer
     trip_id = db.Column(db.String(), primary_key=True)
     trip_headsign = db.Column(db.String())
     direction_id = db.Column(db.Integer)
-    shape_id = db.Column(db.Integer)  # not integrarting shapes
+    shape_id = db.Column(db.Integer)  # not connectiong as multiple rows for one shape_id
     brigade_id = db.Column(db.String())
     vehicle = db.Column(db.Integer, db.ForeignKey("vehicle_type.vehicle_type_id"))
     variant_id = db.Column(

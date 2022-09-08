@@ -186,6 +186,17 @@ class CityData:
             for route in self.routes
         ]
 
+        shapes = [
+            app_data.city.Shape(
+                city_id = city_id,
+                shape_id = shape['shape_id'],
+                shape_pt_lat = shape['shape_pt_lat'],
+                shape_pt_lon = shape['shape_pt_lon'],
+                shape_pt_sequence = shape['shape_pt_sequence']
+            )
+            for shape in self.shapes
+        ]
+
         time_convert = (
             lambda t: f"{str(int(t.split(':')[0])%24)}:{t.split(':')[1]}:{t.split(':')[2]}"
         )
@@ -266,9 +277,17 @@ class CityData:
             len(route_types) +\
             len(stops) +\
             len(variants) +\
-            len(vehicle_types)
+            len(vehicle_types) +\
+            len(shapes)
 
         print(f"ACTION: inserting {inserted_rows} rows to 6 tables")
+
+        for shape in shapes:
+            db.session.add(shape)
+
+        db.session.commit()  # commit shapes
+        print(f"ACTION: inserting {len(shapes)} rows to 1 table")
+
 
         for control_stop in control_stops:
             db.session.add(control_stop)

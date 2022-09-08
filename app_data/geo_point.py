@@ -51,6 +51,19 @@ class GeoPoint():
 
         distance_to_point = lambda point: geodesic(self.coordinates, point).kilometers
 
+        '''nearest_stops = sorted([
+            stop for stop in db_stops
+            if distance_to_point((stop.stop_lat, stop.stop_lon)) <= self.max_distance
+            ], key=lambda d: d['distance'])
+
+        distance_to_stop = [
+            {
+            "stop_name": stop.stop_name,
+            "stop_id": stop.stop_id,
+            "distance": distance_to_point((stop.stop_lat, stop.stop_lon)),
+            }
+            for stop in nearest_stops
+            ]'''
         distance_to_stop = sorted([
             {
             "stop_name": stop.stop_name,

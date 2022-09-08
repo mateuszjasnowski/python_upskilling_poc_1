@@ -168,8 +168,8 @@ def post_city_create():
         return {"Status": "Success", "content": city_data.items()}, 201
     return {"Status": "FAILED", "content": "Something came wrong!"}, 500
 
-@app.route("/stop/closest", methods=["GET"])
-def get_stop_closest():
+@app.route("/stop/nearest", methods=["GET"])
+def get_stop_nearest():
     """
     API ENDPOINT
     Reciving:
@@ -190,6 +190,7 @@ def get_stop_closest():
             - stop_id
             - stop_name
     """
+    #GETTING PARAMS
     if "city_id" not in request.args:
         return {"Status": "Failed", "Error": "Missing required parameter: 'city_id'"}, 400
 
@@ -204,20 +205,81 @@ def get_stop_closest():
             get_coordinates = location_to_cords(request.args.get("location"))
         except AttributeError as error:
             return {"Status": "Failed", "Error": str(error)}, 404
-
-
     elif "coordinates" not in request.args:
         return {
             "Status": "Failed",
             "Error": "Missing required parameter: 'location' or 'coordinates'"
             }, 400
-
     else:
         get_coordinates = tuple(request.args.get("coordinates").replace(" ", "").split(','))
 
+    #ENDPOINT OPERATIONS
     my_location = GeoPoint(get_coordinates, get_city_id, get_age)
 
     return {
         "my_location": my_location.__dict__,
         "top_5_closests_stops": my_location.top_5_closest_stops()
     }
+
+@app.route('/stop/nearest/departures', methods=["GET"])
+def get_stop_nearest_departures():
+    """
+    API ENDPOINT
+    Reciving:
+    - city_id *
+    - age *
+    - coordinates ** or
+    - location **
+    - time ** #if not given is current time
+    *-required
+    **-required one of
+
+    Returns:
+    my_location - info about recieved data
+    top_5_closest_stops -
+        list of 5 closests stop
+        in range of max distance for age
+        with data:
+            - distance (from my_location to stop in km)
+            - stop_id
+            - stop_name
+            - next_departure_time
+            - next_departure_line
+            - next_departure_direction
+    """
+    #GETTING PARAMS
+    if "city_id" not in request.args:
+        return {"Status": "Failed", "Error": "Missing required parameter: 'city_id'"}, 400
+
+    if 'age' not in request.args:
+        return {"Status": "Failed", "Error": "Missing required parameter: 'age'"}, 400
+
+    get_city_id = request.args.get("city_id")
+    get_age = request.args.get("age")
+
+    if "location" in request.args:
+        try:
+            get_coordinates = location_to_cords(request.args.get("location"))
+        except AttributeError as error:
+            return {"Status": "Failed", "Error": str(error)}, 404
+    elif "coordinates" not in request.args:
+        return {
+            "Status": "Failed",
+            "Error": "Missing required parameter: 'location' or 'coordinates'"
+            }, 400
+    else:
+        get_coordinates = tuple(request.args.get("coordinates").replace(" ", "").split(','))
+
+    if "departure_time" in request.args:
+        get_departure_time = datetime.strptime(request.args.get("departure_time"), "%Y-%m-%d %H:%M")
+    else:
+        get_departure_time = datetime.now()
+
+    #ENDPOINT OPERATIONS
+    my_location = GeoPoint(get_coordinates, get_city_id, get_age)
+    closest_stops = my_location.top_5_closest_stops()
+
+    for stop in closest_stops:
+        print(str(stop))
+
+    return str(get_departure_time)

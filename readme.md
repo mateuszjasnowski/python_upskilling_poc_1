@@ -4,12 +4,18 @@
 #0.0.2 - Geting city data from URL
 #0.0.3 - Geting data from DB
 #0.0.4 - Uploading data to DB
+# PoC 1
 #0.1.0 - GET cities
-#0.1.1 - GET routes-wroclaw [HERE]
-#0.1.2 - Running docker container [WIP]
-#0.1.2 - PoC 1 code review
-#0.2.0 - PoC 2 TODO
-#0.2.1 - ?
+#0.1.1 - GET routes-wroclaw
+#0.1.2 - Running docker container [SKIPPED ISSUE #3]
+#0.1.3 - PoC 1 code review
+# PoC 2
+#0.2.0 - GET top 5 closest stops [HERE]
+#0.2.1 - GET departures from top 5 closest stops
+#0.2.2 - Unit tests for endpoints created in 0.2.x
+#0.2.3 - ?
+#0.3.0 - ?
+#0.1.0 - ?
 ```
 
 # How to use

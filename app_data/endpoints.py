@@ -10,6 +10,8 @@ from app_data import app, db
 from app_data.get_city_data import CityData
 from app_data.city import City, Route
 
+from app_data.geo_point import location_to_cords, GeoPoint
+
 
 @app.route("/", methods=["GET"])
 @app.route("/version", methods=["GET"])
@@ -49,7 +51,6 @@ def get_city():
 
     else:
         db_get_city = City.query.all()
-        ""
 
     if not db_get_city:
         return {
@@ -166,3 +167,57 @@ def post_city_create():
     if city_data.insert_to_db(city_id):
         return {"Status": "Success", "content": city_data.items()}, 201
     return {"Status": "FAILED", "content": "Something came wrong!"}, 500
+
+@app.route("/stop/closest", methods=["GET"])
+def get_stop_closest():
+    """
+    API ENDPOINT
+    Reciving:
+    - city_id *
+    - age *
+    - coordinates ** or
+    - location **
+    *-required
+    **-required one of
+
+    Returns:
+    my_location - info about recieved data
+    top_5_closest_stops -
+        list of 5 closests stop
+        in range of max distance for age
+        with data:
+            - distance (from my_location to stop in km)
+            - stop_id
+            - stop_name
+    """
+    if "city_id" not in request.args:
+        return {"Status": "Failed", "Error": "Missing required parameter: 'city_id'"}, 400
+
+    if 'age' not in request.args:
+        return {"Status": "Failed", "Error": "Missing required parameter: 'age'"}, 400
+
+    get_city_id = request.args.get("city_id")
+    get_age = request.args.get("age")
+
+    if "location" in request.args:
+        try:
+            get_coordinates = location_to_cords(request.args.get("location"))
+        except AttributeError as error:
+            return {"Status": "Failed", "Error": str(error)}, 404
+
+
+    elif "coordinates" not in request.args:
+        return {
+            "Status": "Failed",
+            "Error": "Missing required parameter: 'location' or 'coordinates'"
+            }, 400
+
+    else:
+        get_coordinates = tuple(request.args.get("coordinates").replace(" ", "").split(','))
+
+    my_location = GeoPoint(get_coordinates, get_city_id, get_age)
+
+    return {
+        "my_location": my_location.__dict__,
+        "top_5_closests_stops": my_location.top_5_closest_stops()
+    }

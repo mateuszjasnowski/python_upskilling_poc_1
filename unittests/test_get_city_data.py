@@ -179,6 +179,7 @@ class TestCityDataDb(unittest.TestCase):
             db.session.query(city.Stop).filter(city.Stop.city_id == cls.city_id).delete()
             db.session.query(city.Variant).filter(city.Variant.city_id == cls.city_id).delete()
             db.session.query(city.VehicleType).filter(city.VehicleType.city_id == cls.city_id).delete()
+            db.session.query(city.Shape).filter(city.Shape.city_id == cls.city_id).delete()
 
             db.session.commit()
         except exc.IntegrityError as integrity_error:

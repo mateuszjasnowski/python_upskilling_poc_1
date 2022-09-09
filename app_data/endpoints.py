@@ -4,6 +4,7 @@ from datetime import datetime
 
 from flask import request
 from sqlalchemy import exc
+from app_data.find_route import FindRoute
 
 from app_data.secrets import API_VERSION
 from app_data import app, db
@@ -319,4 +320,86 @@ def get_stop_nearest_departures():
             }
             for stop in my_location.stop_next_departure(get_departure_time)
         ],
+    }
+
+@app.route("/trip/connection", methods=["GET"])
+def get_trip_connection():
+    '''
+    API ENDPOINT
+    Reciving:
+        - city_id *
+        - age *
+        - start_coordinates ** or
+        - start_location **
+        AND
+        - end_coordinates ** or
+        - end_location **
+        - departure_time ** #if not given is current time
+    *-required
+    **-required one of
+
+    Returns:
+        TBD
+    '''
+    # GETTING PARAMS
+    if "city_id" not in request.args:
+        return {
+            "Status": "Failed",
+            "Error": "Missing required parameter: 'city_id'",
+        }, 400
+
+    if "age" not in request.args:
+        return {"Status": "Failed", "Error": "Missing required parameter: 'age'"}, 400
+
+    get_city_id = request.args.get("city_id")
+    get_age = request.args.get("age")
+
+    if "start_location" in request.args:
+        try:
+            get_start_coordinates = location_to_cords(request.args.get("start_location"))
+        except AttributeError as error:
+            return {"Status": "Failed", "Error": str(error)}, 404
+    elif "start_location" not in request.args:
+        return {
+            "Status": "Failed",
+            "Error": "Missing required parameter: 'start_location' or 'start_location'",
+        }, 400
+    else:
+        get_start_coordinates = tuple(
+            request.args.get("start_location").replace(" ", "").split(",")
+        )
+
+    if "end_location" in request.args:
+        try:
+            get_end_coordinates = location_to_cords(request.args.get("end_location"))
+        except AttributeError as error:
+            return {"Status": "Failed", "Error": str(error)}, 404
+    elif "end_location" not in request.args:
+        return {
+            "Status": "Failed",
+            "Error": "Missing required parameter: 'end_location' or 'end_location'",
+        }, 400
+    else:
+        get_end_coordinates = tuple(
+            request.args.get("end_location").replace(" ", "").split(",")
+        )
+
+    if "departure_time" in request.args:
+        get_departure_time = datetime.strptime(
+            request.args.get("departure_time"), "%Y-%m-%d %H:%M"
+        )
+    else:
+        get_departure_time = datetime.now()
+
+    # ENDPOINT OPERATIONS
+    start_location = GeoPoint(get_start_coordinates, get_city_id, get_age)
+    end_location = GeoPoint(get_end_coordinates, get_city_id, get_age)
+
+    route_find = FindRoute(start_location, end_location, get_departure_time)
+
+    print(route_find.lines_in_range)
+
+    return {
+        "start": route_find.start.__dict__,
+        "end": route_find.end.__dict__
     }

@@ -66,8 +66,6 @@ class GeoPoint:
             key=lambda d: d["distance"],
         )
 
-        print(len(nearest_stops))
-
         return nearest_stops
 
     def stop_next_departure(self, refference_time: datetime) -> list:

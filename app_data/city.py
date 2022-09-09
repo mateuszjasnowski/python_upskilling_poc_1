@@ -189,6 +189,14 @@ class Stop(db.Model):  # 1-layer
     control_stops = db.relationship("ControlStop", backref="stop", lazy=True)
     stop_times = db.relationship("StopTime", backref="stop", lazy=True)
 
+    def get_lines(self):
+        """returing lines whitch are stopping on stop"""
+        lines_on_stop = {
+            stop_time.trip.route_id
+            for stop_time in self.stop_times
+        }
+        return lines_on_stop
+
 
 class Trip(db.Model):  # 3rd layer
     """trip table"""

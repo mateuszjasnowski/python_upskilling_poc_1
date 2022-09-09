@@ -397,9 +397,10 @@ def get_trip_connection():
 
     route_find = FindRoute(start_location, end_location, get_departure_time)
 
-    print(route_find.lines_in_range)
-
     return {
         "start": route_find.start.__dict__,
-        "end": route_find.end.__dict__
+        "end": route_find.end.__dict__,
+        "possible direct connections": [
+            line for line in route_find.direct_trip_lines()
+            ]
     }

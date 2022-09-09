@@ -31,7 +31,7 @@ class City(db.Model):
 
     agencies = db.relationship("Agency", backref="city", lazy=True)
     services = db.relationship("Calendar", backref="city", lazy=True)
-    control_stops = db.relationship("ControlStop", backref='city', lazy=True)
+    control_stops = db.relationship("ControlStop", backref="city", lazy=True)
     route_types2 = db.relationship("RouteType2", backref="city", lazy=True)
     routes = db.relationship("Route", backref="city", lazy=True)
     stop_times = db.relationship("StopTime", backref="city", lazy=True)
@@ -76,6 +76,18 @@ class Calendar(db.Model):  # 1-layer
 
     trips = db.relationship("Trip", backref="service", lazy=True)
 
+    def week(self) -> dict:
+        """returning dict of weekdays"""
+        return {
+            "monday": self.monday,
+            "tuesday": self.tuesday,
+            "wednesday": self.wednesday,
+            "thursday": self.thursday,
+            "friday": self.friday,
+            "saturday": self.saturday,
+            "sunday": self.sunday,
+        }
+
 
 class ControlStop(db.Model):  # 2-layer
     """control_stop table"""
@@ -116,8 +128,11 @@ class Route(db.Model):  # 2-layer
     valid_from = db.Column(db.DateTime)
     valid_until = db.Column(db.DateTime)
 
-    trips = db.relationship("Trip", backref='route', lazy=True)
+    trips = db.relationship("Trip", backref="route", lazy=True)
 
+    def get_direction(self, direction_id: int) -> str:
+        """returning direction's end stop"""
+        return self.route_desc.split("|")[direction_id].split(" - ")[-1]
 
     def get_dict(self) -> dict:
         """returning dict with object's attributes"""
@@ -126,15 +141,16 @@ class Route(db.Model):  # 2-layer
             "route_desc": self.route_desc,
             "route_short_name": self.route_short_name,
             "agency": self.agency.agency_name,
-            "route_type2": self.route_type2.route_type2_name
+            "route_type2": self.route_type2.route_type2_name,
         }
 
     def __repr__(self) -> str:
         return f"Route('{self.route_id}', '{self.route_desc}')"
 
 
-class Shape(db.Model): # 1st layer
+class Shape(db.Model):  # 1st layer
     """shape table"""
+
     point_id = db.Column(db.Integer, primary_key=True)
     city_id = db.Column(db.Integer, db.ForeignKey("city.city_id"), nullable=False)
     shape_id = db.Column(db.Integer)
@@ -185,14 +201,16 @@ class Trip(db.Model):  # 3rd layer
     trip_id = db.Column(db.String(), primary_key=True)
     trip_headsign = db.Column(db.String())
     direction_id = db.Column(db.Integer)
-    shape_id = db.Column(db.Integer)  # not connectiong as multiple rows for one shape_id
+    shape_id = db.Column(
+        db.Integer
+    )  # not connectiong as multiple rows for one shape_id
     brigade_id = db.Column(db.String())
     vehicle = db.Column(db.Integer, db.ForeignKey("vehicle_type.vehicle_type_id"))
     variant_id = db.Column(
         db.Integer, db.ForeignKey("variant.variant_id"), nullable=False
     )
 
-    stop_times = db.relationship("StopTime", backref='trip', lazy=True)
+    stop_times = db.relationship("StopTime", backref="trip", lazy=True)
 
 
 class Variant(db.Model):  # 1-layer
@@ -207,6 +225,7 @@ class Variant(db.Model):  # 1-layer
 
     control_stops = db.relationship("ControlStop", backref="variant", lazy=True)
     trips = db.relationship("Trip", backref="variant", lazy=True)
+
 
 class VehicleType(db.Model):  # 1-layer
     """vehicle_type table"""

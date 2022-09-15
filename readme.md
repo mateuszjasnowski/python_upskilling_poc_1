@@ -11,7 +11,7 @@
 #0.1.3 - PoC 1 code review
 # PoC 2
 #0.2.0 - GET top 5 closest stops [HERE]
-#0.2.1 - GET departures from top 5 closest stops
+#0.2.1 - GET next departure for route from point A to B
 #0.2.2 - Unit tests for endpoints created in 0.2.x
 #0.2.3 - ?
 #0.3.0 - ?
@@ -35,7 +35,7 @@ DB_USER = '' #DB user name
 DB_USER_PASS = '' #DB user's password
 DB_ADDR = '' #DB password with port
 
-DB_URL = f'postgres://{DB_USER}:{DB_USER_PASS}@{DB_ADDR}' #You can set it like this
+DB_URL = f'postgres://{DB_USER}:{DB_USER_PASS}@{DB_ADDR}/<table_name>' #DB table
 ```
 
 ## App running in Docker container

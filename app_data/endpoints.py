@@ -322,9 +322,10 @@ def get_stop_nearest_departures():
         ],
     }
 
+
 @app.route("/trip/connection", methods=["GET"])
 def get_trip_connection():
-    '''
+    """
     API ENDPOINT
     Reciving:
         - city_id *
@@ -339,8 +340,13 @@ def get_trip_connection():
     **-required one of
 
     Returns:
-        TBD
-    '''
+        connections [
+            - direction
+            - line
+            - departure_time
+            - TODO stop to exit
+        ]
+    """
     # GETTING PARAMS
     if "city_id" not in request.args:
         return {
@@ -356,17 +362,19 @@ def get_trip_connection():
 
     if "start_location" in request.args:
         try:
-            get_start_coordinates = location_to_cords(request.args.get("start_location"))
+            get_start_coordinates = location_to_cords(
+                request.args.get("start_location")
+            )
         except AttributeError as error:
             return {"Status": "Failed", "Error": str(error)}, 404
-    elif "start_location" not in request.args:
+    elif "start_coordinates" not in request.args:
         return {
             "Status": "Failed",
-            "Error": "Missing required parameter: 'start_location' or 'start_location'",
+            "Error": "Missing required parameter: 'start_location' or 'start_coordinates'",
         }, 400
     else:
         get_start_coordinates = tuple(
-            request.args.get("start_location").replace(" ", "").split(",")
+            request.args.get("start_coordinates").replace(" ", "").split(",")
         )
 
     if "end_location" in request.args:
@@ -374,14 +382,14 @@ def get_trip_connection():
             get_end_coordinates = location_to_cords(request.args.get("end_location"))
         except AttributeError as error:
             return {"Status": "Failed", "Error": str(error)}, 404
-    elif "end_location" not in request.args:
+    elif "end_coordinates" not in request.args:
         return {
             "Status": "Failed",
-            "Error": "Missing required parameter: 'end_location' or 'end_location'",
+            "Error": "Missing required parameter: 'end_location' or 'end_coordinates'",
         }, 400
     else:
         get_end_coordinates = tuple(
-            request.args.get("end_location").replace(" ", "").split(",")
+            request.args.get("end_coordinates").replace(" ", "").split(",")
         )
 
     if "departure_time" in request.args:
@@ -395,12 +403,25 @@ def get_trip_connection():
     start_location = GeoPoint(get_start_coordinates, get_city_id, get_age)
     end_location = GeoPoint(get_end_coordinates, get_city_id, get_age)
 
-    route_find = FindRoute(start_location, end_location, get_departure_time)
+    route_find = FindRoute(start_location, end_location)
+
+    connections = route_find.find_connection(get_departure_time)
 
     return {
         "start": route_find.start.__dict__,
         "end": route_find.end.__dict__,
-        "possible direct connections": [
-            line for line in route_find.direct_trip_lines()
-            ]
+        "connections": [
+            {
+                "stop": stop_time.stop.stop_name,
+                "route-direction": stop_time.trip.direction_id,
+                "stop-sequence": stop_time.stop_sequence,
+                "stop_time_id": stop_time.stop_time_id,
+                "line": stop_time.trip.route_id,
+                "departure_time": str(stop_time.departure_time),
+                "direction": stop_time.trip.route.get_direction(
+                    stop_time.trip.direction_id
+                ),
+            }
+            for stop_time in connections
+        ],
     }

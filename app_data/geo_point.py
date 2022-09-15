@@ -22,6 +22,17 @@ def location_to_cords(address: str) -> tuple:
     raise AttributeError(f"location in type {type(location)} instead of Location")
 
 
+def distance_to_point(
+    point_a: tuple, point_b: tuple, unit: str = "kilometers"
+) -> float:
+    """
+    Reciving points a and b (tuples with cords)
+    returns distance bettwen points
+    """
+    distance = geodesic(point_a, point_b)
+    return getattr(distance, unit)
+
+
 class GeoPoint:
     """Geo location as reference point"""
 
@@ -51,16 +62,16 @@ class GeoPoint:
         """Returns list of stops with distance to geo point"""
         db_stops = Stop.query.filter_by(city_id=self.city_id).all()
 
-        distance_to_point = lambda point: geodesic(self.coordinates, point).kilometers
-
         nearest_stops = sorted(
             [
                 {
                     "stop": stop,
-                    "distance": distance_to_point((stop.stop_lat, stop.stop_lon)),
+                    "distance": distance_to_point(
+                        self.coordinates, (stop.stop_lat, stop.stop_lon)
+                    ),
                 }
                 for stop in db_stops
-                if distance_to_point((stop.stop_lat, stop.stop_lon))
+                if distance_to_point(self.coordinates, (stop.stop_lat, stop.stop_lon))
                 <= self.max_distance
             ],
             key=lambda d: d["distance"],

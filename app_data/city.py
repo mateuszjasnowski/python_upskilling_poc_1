@@ -159,7 +159,8 @@ class Shape(db.Model):  # 1st layer
     shape_pt_sequence = db.Column(db.Integer)
 
     def __repr__(self) -> str:
-        return f"Shape('{self.shape_id}', '{self.shape_pt_lat},{self.shape_pt_lon}', '{self.shape_pt_sequence})"
+        return f"Shape('{self.shape_id}', '{self.shape_pt_lat},"+\
+        f"{self.shape_pt_lon}', '{self.shape_pt_sequence})"
 
 
 class StopTime(db.Model):  # 4th layer
@@ -174,6 +175,20 @@ class StopTime(db.Model):  # 4th layer
     stop_sequence = db.Column(db.Integer)
     pickup_type = db.Column(db.Integer)
     drop_off_type = db.Column(db.Integer)
+
+    def next_stop(self):
+        """returning stop_time for next stop on trip"""
+
+        next_stop_time = StopTime.query.filter_by(
+            trip_id=self.trip_id, stop_sequence=self.stop_sequence + 1
+        ).first()
+
+        if next_stop_time:
+            return next_stop_time
+        raise StopIteration(
+            f"Not found next stop for route {self.trip_id}\
+            (No stop_sequence = {self.stop_sequence + 1})"
+        )
 
 
 class Stop(db.Model):  # 1-layer
@@ -191,10 +206,7 @@ class Stop(db.Model):  # 1-layer
 
     def get_lines(self):
         """returing lines whitch are stopping on stop"""
-        lines_on_stop = {
-            stop_time.trip.route_id
-            for stop_time in self.stop_times
-        }
+        lines_on_stop = {stop_time.trip.route_id for stop_time in self.stop_times}
         return lines_on_stop
 
 

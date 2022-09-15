@@ -340,11 +340,20 @@ def get_trip_connection():
     **-required one of
 
     Returns:
-        connections [
+        start: details about start point
+        end: details about end point
+        connections [list of next possible connections
+        with data:
             - direction
             - line
-            - departure_time
-            - TODO stop to exit
+            - FROM {
+                departure_time,
+                stop name
+            }
+            - TO {
+                arrival_time,
+                stop_name
+            }
         ]
     """
     # GETTING PARAMS
@@ -405,19 +414,22 @@ def get_trip_connection():
 
     route_find = FindRoute(start_location, end_location)
 
-    connections = route_find.find_connection(get_departure_time)
+    try:
+        connections = route_find.find_connection(get_departure_time)
+        # connections = sorted(connections, key= lambda s_t: s_t.departure_time)
+    except RuntimeError as error:
+        return {"Status": "Failed", "Error": str(error)}, 404
 
     return {
-        "start": route_find.start.__dict__,
-        "end": route_find.end.__dict__,
+        "starting point": route_find.start.__dict__,
+        "ending point": route_find.end.__dict__,
         "connections": [
             {
-                "stop": stop_time.stop.stop_name,
-                "route-direction": stop_time.trip.direction_id,
-                "stop-sequence": stop_time.stop_sequence,
-                "stop_time_id": stop_time.stop_time_id,
+                "FROM": stop_time.details(),
+                "TO": route_find.find_end_stop(stop_time).details(
+                    time_to_return="arrival"
+                ),
                 "line": stop_time.trip.route_id,
-                "departure_time": str(stop_time.departure_time),
                 "direction": stop_time.trip.route.get_direction(
                     stop_time.trip.direction_id
                 ),

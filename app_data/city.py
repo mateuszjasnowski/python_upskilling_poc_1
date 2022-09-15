@@ -159,8 +159,10 @@ class Shape(db.Model):  # 1st layer
     shape_pt_sequence = db.Column(db.Integer)
 
     def __repr__(self) -> str:
-        return f"Shape('{self.shape_id}', '{self.shape_pt_lat},"+\
-        f"{self.shape_pt_lon}', '{self.shape_pt_sequence})"
+        return (
+            f"Shape('{self.shape_id}', '{self.shape_pt_lat},"
+            + f"{self.shape_pt_lon}', '{self.shape_pt_sequence})"
+        )
 
 
 class StopTime(db.Model):  # 4th layer
@@ -189,6 +191,16 @@ class StopTime(db.Model):  # 4th layer
             f"Not found next stop for route {self.trip_id}\
             (No stop_sequence = {self.stop_sequence + 1})"
         )
+
+    def details(self, time_to_return: str = "departure") -> dict:
+        """Return dict with stop_time details"""
+        details = {"stop": self.stop.stop_name}
+        if time_to_return == "arrival":
+            details["arrival_time"] = self.arrival_time.strftime("%H:%M")
+        elif time_to_return == "departure":
+            details["departure_time"] = self.departure_time.strftime("%H:%M")
+
+        return details
 
 
 class Stop(db.Model):  # 1-layer

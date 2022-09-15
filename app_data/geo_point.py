@@ -19,7 +19,7 @@ def location_to_cords(address: str) -> tuple:
     if isinstance(location, Location):
         return (location.latitude, location.longitude)
 
-    raise AttributeError(f"location in type {type(location)} instead of Location")
+    raise AttributeError(f"Cannot find location {address}")
 
 
 def distance_to_point(

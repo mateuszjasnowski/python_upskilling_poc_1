@@ -6,7 +6,9 @@ import unittest
 
 from app_data.find_route import FindRoute
 
-class TestFindRoute(unittest.TestCase):
-    """Testing FindRoute class"""
 
-    pass #TODO
+class TestFindRoute(unittest.TestCase):
+    """TODO"""
+
+    def test_test_case(self):
+        pass

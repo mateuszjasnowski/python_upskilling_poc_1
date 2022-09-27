@@ -40,7 +40,10 @@ class GeoPoint:
     def __init__(self, coordinats: tuple, city_id: id, age: int) -> None:
         """Creating GeoPoint with coordinates of point and city_id to search in DB"""
         # self.latitute, self.longitutie = coordinats
-        self.coordinates = coordinats
+        if isinstance(coordinats, tuple):
+            self.coordinates = coordinats
+        else:
+            raise TypeError(f"{coordinats} is not tuple")
         self.city_id = city_id
         self.age = int(age)
 

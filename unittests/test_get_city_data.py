@@ -124,6 +124,7 @@ class TestCityData(unittest.TestCase):
 
 class TestCityDataDb(unittest.TestCase):
     """
+    !!!DB CONNECTION REQUIRED!!!
     !!! USE ONLY DB INSERT READY DATA SETS !!!
     Testing insert_to_db method
     """
@@ -131,6 +132,13 @@ class TestCityDataDb(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """Setup for class"""
+        try:
+            db.inspect(db.engine)
+        except exc.OperationalError:
+            cls.db_connected = False
+        else:
+            cls.db_connected = True
+
         cls.download_mode = False
         cls.city_dir = "./unittests/cities_test_set/"
         cls.city_name = "test_city"
@@ -138,70 +146,99 @@ class TestCityDataDb(unittest.TestCase):
 
         test_set_2 = cls.city_dir + "test_city_2_db/"
 
-        cls.test_set_2 = CityData(
-            cls.city_name, cls.city_url, cls.download_mode, city_dir=test_set_2
-        )
+        if cls.db_connected:
+            cls.test_set_2 = CityData(
+                cls.city_name, cls.city_url, cls.download_mode, city_dir=test_set_2
+            )
 
-        if not city.City.query.filter_by(city_id=4).first():
-            new_city = city.City(
-                city_id = 4,
-                city_name = cls.city_name
+            if not city.City.query.filter_by(city_id=4).first():
+                new_city = city.City(city_id=4, city_name=cls.city_name)
+                try:
+                    db.session.add(new_city)
+                    db.session.commit()
+                except exc.IntegrityError as integrity_error:
+                    db.session.rollback()
+                    print(integrity_error)
+                cls.city_id = (
+                    city.City.query.filter_by(city_name=cls.city_name).first().city_id
                 )
-            try:
-                db.session.add(new_city)
-                db.session.commit()
-            except exc.IntegrityError as integrity_error:
-                db.session.rollback()
-                print(integrity_error)
-            cls.city_id = city.City.query.filter_by(city_name=cls.city_name).first().city_id
-        else:
-            cls.city_id = 4
+            else:
+                cls.city_id = 4
 
     @classmethod
     def tearDownClass(cls) -> None:
         try:
-            db.session.query(city.StopTime).filter(city.StopTime.city_id == cls.city_id).delete()
+            db.session.query(city.StopTime).filter(
+                city.StopTime.city_id == cls.city_id
+            ).delete()
 
             db.session.commit()
 
-            db.session.query(city.Trip).filter(city.Trip.city_id == cls.city_id).delete()
+            db.session.query(city.Trip).filter(
+                city.Trip.city_id == cls.city_id
+            ).delete()
 
             db.session.commit()
 
-            db.session.query(city.ControlStop).filter(city.ControlStop.city_id == cls.city_id).delete()
-            db.session.query(city.Route).filter(city.Route.city_id == cls.city_id).delete()
+            db.session.query(city.ControlStop).filter(
+                city.ControlStop.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.Route).filter(
+                city.Route.city_id == cls.city_id
+            ).delete()
 
             db.session.commit()
 
-            db.session.query(city.Agency).filter(city.Agency.city_id == cls.city_id).delete()
-            db.session.query(city.Calendar).filter(city.Calendar.city_id == cls.city_id).delete()
-            db.session.query(city.RouteType2).filter(city.RouteType2.city_id == cls.city_id).delete()
-            db.session.query(city.Stop).filter(city.Stop.city_id == cls.city_id).delete()
-            db.session.query(city.Variant).filter(city.Variant.city_id == cls.city_id).delete()
-            db.session.query(city.VehicleType).filter(city.VehicleType.city_id == cls.city_id).delete()
-            db.session.query(city.Shape).filter(city.Shape.city_id == cls.city_id).delete()
+            db.session.query(city.Agency).filter(
+                city.Agency.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.Calendar).filter(
+                city.Calendar.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.RouteType2).filter(
+                city.RouteType2.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.Stop).filter(
+                city.Stop.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.Variant).filter(
+                city.Variant.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.VehicleType).filter(
+                city.VehicleType.city_id == cls.city_id
+            ).delete()
+            db.session.query(city.Shape).filter(
+                city.Shape.city_id == cls.city_id
+            ).delete()
 
             db.session.commit()
         except exc.IntegrityError as integrity_error:
             db.session.rollback()
             print(integrity_error)
 
+    def setUp(self) -> None:
+        """Action executed on every test instance"""
+
+        self.assertTrue(self.db_connected, "DB not connected")
+
     def test_insert_to_db_set_2(self):
+        """Testing inserting to db test_set_2"""
         self.assertTrue(self.test_set_2.insert_to_db(self.city_id))
 
         test_city_routes = city.Route.query.filter_by(city_id=self.city_id).all()
         self.assertEqual(len(test_city_routes), 1)
         self.assertEqual(test_city_routes[0].route_id, "test_route")
 
-        #get_dict method for Route
+        # get_dict method for Route
         test_cirt_routes_dict = test_city_routes[0].get_dict()
         self.assertIsInstance(test_cirt_routes_dict, dict)
-        self.assertAlmostEqual(test_cirt_routes_dict['route_id'], test_city_routes[0].route_id)
+        self.assertAlmostEqual(
+            test_cirt_routes_dict["route_id"], test_city_routes[0].route_id
+        )
 
         test_city_trips = city.Trip.query.filter_by(city_id=self.city_id).all()
         self.assertEqual(len(test_city_trips), 1)
         self.assertEqual(test_city_trips[0].route_id, "test_route")
-
 
 
 if __name__ == "__main__":

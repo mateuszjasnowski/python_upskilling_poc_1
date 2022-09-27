@@ -3,6 +3,7 @@
 Geo points class and operations on them
 """
 from datetime import datetime
+
 from geopy import Nominatim
 from geopy.location import Location
 from geopy.distance import geodesic

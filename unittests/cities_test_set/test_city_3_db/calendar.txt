@@ -1,0 +1,5 @@
+﻿service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+994,0,0,0,0,0,0,1,20220924,20220930
+998,0,0,0,0,1,0,0,20220924,20220930
+996,1,1,1,1,0,0,0,20220924,20220930
+993,0,0,0,0,0,1,0,20220924,20220930

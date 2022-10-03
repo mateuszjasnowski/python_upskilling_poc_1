@@ -1,0 +1,8 @@
+﻿vehicle_type_id,vehicle_type_name,vehicle_type_description,vehicle_type_symbol
+99043,"m - Moderus","","m"
+99092,"M - Moderus [N!]","N - kurs obsługiwany przez tramwaj NISKOPODŁOGOWY","M"
+99093,"S - Skoda 16T [N]","N - kurs obsługiwany przez tramwaj NISKOPODŁOGOWY","S"
+99096,"$ - Skoda 19T [N]","N - kurs obsługiwany przez tramwaj NISKOPODŁOGOWY","$"
+990123,"P - Pesa [N]","N - kurs obsługiwany przez tramwaj NISKOPODŁOGOWY","P"
+990137,"W - 205/Moderus [N]","N - kurs obsługiwany przez tramwaj NISKOPODŁOGOWY","W"
+990141,"D - 2x105N/2x204WrAs","","D"

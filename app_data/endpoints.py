@@ -10,6 +10,7 @@ from app_data.secrets import API_VERSION
 from app_data import app, db
 from app_data.get_city_data import CityData
 from app_data.city import City, Route
+import app_data.city as city_class
 
 from app_data.geo_point import location_to_cords, GeoPoint
 
@@ -71,43 +72,7 @@ def get_city():
     }
 
 
-@app.route("/routes", methods=["GET"])
-def get_routes():
-    """
-    API ENDPOINT
-    Reciving:
-    city_id (*)
-    (*) - Required
-
-    Returning:
-    {"city": name, "routes": [{<route> #TODO}, {...}]}
-    """
-
-    if "city_id" not in request.args:
-        return {"Status": "FAILED", "Error": "Not given city_id parameter"}, 402
-    get_city_id = request.args.get("city_id")
-
-    db_get_city = City.query.filter_by(city_id=get_city_id).first()
-    db_get_routes = Route.query.filter_by(city_id=get_city_id).all()
-
-    if not db_get_city:
-        return {
-            "Status": "Failed",
-            "Error": f"Not found any city with id {get_city_id}",
-        }, 404
-    if not db_get_routes:
-        return {
-            "Status": "Failed",
-            "Error": f"Not found any route for city with id {get_city_id}",
-        }, 404
-
-    return {
-        "city": db_get_city.city_name,
-        "routes": [route.get_dict() for route in db_get_routes],
-    }
-
-
-@app.route("/city/create", methods=["POST"])
+@app.route("/city", methods=["POST"])
 def post_city_create():
     """
     Checking if city exist
@@ -168,6 +133,149 @@ def post_city_create():
     if city_data.insert_to_db(city_id):
         return {"Status": "Success", "content": city_data.items()}, 201
     return {"Status": "FAILED", "content": "Something came wrong!"}, 500
+
+
+@app.route("/city", methods=["DELETE"])  # NOT TESTED
+def delete_city_delete():
+    """
+    API ENDPOINT
+    Reciving:
+    - city_id**
+    - city_name**
+    ** required one of
+
+    Returning:
+    TODO
+    """
+    error = ""
+    error_val = ""
+    request_data = request.headers
+
+    if "city_id" in request_data:
+        get_city_id = request_data.get("city_id")
+        db_get_city = City.query.filter_by(city_id=get_city_id).first()
+        error = "id"
+        error_val = get_city_id
+        # city_id = get_city_id
+
+    elif "city_name" in request_data:
+        get_city_name = request_data.get("city_name")
+        db_get_city = City.query.filter_by(city_name=get_city_name).first()
+        error = "name"
+        error_val = get_city_name
+        # if db_get_city:
+        #    city_id = db_get_city.city_id
+
+    else:
+        return {
+            "Status": "FAILED",
+            "Error": "Not given city_id or city_name parameter",
+        }, 402
+
+    if not db_get_city:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any city with {error} = {error_val}",
+        }, 404
+
+    # delete city here
+    try:
+        db.session.query(city_class.StopTime).filter(
+            city_class.StopTime.city_id == db_get_city.city_id
+        ).delete()
+
+        db.session.commit()
+
+        db.session.query(city_class.Trip).filter(
+            city_class.Trip.city_id == db_get_city.city_id
+        ).delete()
+
+        db.session.commit()
+
+        db.session.query(city_class.ControlStop).filter(
+            city_class.ControlStop.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.Route).filter(
+            city_class.Route.city_id == db_get_city.city_id
+        ).delete()
+
+        db.session.commit()
+
+        db.session.query(city_class.Agency).filter(
+            city_class.Agency.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.Calendar).filter(
+            city_class.Calendar.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.RouteType2).filter(
+            city_class.RouteType2.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.Stop).filter(
+            city_class.Stop.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.Variant).filter(
+            city_class.Variant.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.VehicleType).filter(
+            city_class.VehicleType.city_id == db_get_city.city_id
+        ).delete()
+        db.session.query(city_class.Shape).filter(
+            city_class.Shape.city_id == db_get_city.city_id
+        ).delete()
+
+        db.session.commit()
+
+        db.session.query(City).filter(City.city_id == db_get_city.city_id).delete()
+
+        db.session.commit()
+    except exc.IntegrityError as integrity_error:
+        db.session.rollback()
+        return {
+            "Status": "Failed",
+            "Error": f"Cannot delete city {db_get_city.city_name} (id = {db_get_city.city_id})",
+            "integrity_error": integrity_error,
+        }, 409
+    else:
+        return {
+            "Status": "Success",
+            "Content": f"Succesfully deleted city {db_get_city.city_name} (city_id = {db_get_city.city_id})",
+        }, 202
+
+
+@app.route("/routes", methods=["GET"])
+def get_routes():
+    """
+    API ENDPOINT
+    Reciving:
+    city_id (*)
+    (*) - Required
+
+    Returning:
+    {"city": name, "routes": [{<route> #TODO}, {...}]}
+    """
+
+    if "city_id" not in request.args:
+        return {"Status": "FAILED", "Error": "Not given city_id parameter"}, 402
+    get_city_id = request.args.get("city_id")
+
+    db_get_city = City.query.filter_by(city_id=get_city_id).first()
+    db_get_routes = Route.query.filter_by(city_id=get_city_id).all()
+
+    if not db_get_city:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any city with id {get_city_id}",
+        }, 404
+    if not db_get_routes:
+        return {
+            "Status": "Failed",
+            "Error": f"Not found any route for city with id {get_city_id}",
+        }, 404
+
+    return {
+        "city": db_get_city.city_name,
+        "routes": [route.get_dict() for route in db_get_routes],
+    }
 
 
 @app.route("/stop/nearest", methods=["GET"])

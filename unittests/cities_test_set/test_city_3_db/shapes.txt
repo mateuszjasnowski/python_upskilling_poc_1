@@ -1,0 +1,2 @@
+﻿shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence
+9999998,51.066015874804,16.986511121093,201

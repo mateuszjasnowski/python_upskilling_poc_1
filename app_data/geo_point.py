@@ -83,31 +83,41 @@ class GeoPoint:
 
         return nearest_stops
 
-    def stop_next_departure(self, refference_time: datetime) -> list:
+    def stop_next_departure(self, refference_time: datetime) -> list[dict]:
         """Returns list of stops with distance and next departure to geo point"""
         closest_stops = self.distance_to_stops()[:5]
+        no_next_departure = []
 
         for stop in closest_stops:
-            next_departure_time = min(
-                [
-                    stop_time.departure_time
+            try:
+                next_departure_time = min(
+                    [
+                        stop_time.departure_time
+                        for stop_time in stop["stop"].stop_times
+                        if stop_time.departure_time > refference_time.time()
+                        and stop_time.trip.service.week()[
+                            refference_time.strftime("%A").lower()
+                        ]
+                        == 1
+                    ]
+                )
+
+                stop["next_departure"] = [
+                    stop_time
                     for stop_time in stop["stop"].stop_times
-                    if stop_time.departure_time > refference_time.time()
+                    if stop_time.departure_time == next_departure_time
                     and stop_time.trip.service.week()[
                         refference_time.strftime("%A").lower()
                     ]
                     == 1
                 ]
-            )
+            except ValueError:
+                no_next_departure.append(stop)
 
-            stop["next_departure"] = [
-                stop_time
-                for stop_time in stop["stop"].stop_times
-                if stop_time.departure_time == next_departure_time
-                and stop_time.trip.service.week()[
-                    refference_time.strftime("%A").lower()
-                ]
-                == 1
-            ]
+        if len(no_next_departure) == 5:
+            return None
+        if len(no_next_departure) != 0:
+            for stop_index in no_next_departure:
+                closest_stops.remove(stop_index)
 
         return closest_stops

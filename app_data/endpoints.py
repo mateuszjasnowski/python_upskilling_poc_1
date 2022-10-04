@@ -236,10 +236,14 @@ def delete_city_delete():
             "integrity_error": integrity_error,
         }, 409
     else:
-        return {
-            "Status": "Success",
-            "Content": f"Succesfully deleted city {db_get_city.city_name} (city_id = {db_get_city.city_id})",
-        }, 202
+        return (
+            {
+                "Status": "Success",
+                "Content": f"Succesfully deleted city \
+{db_get_city.city_name} (city_id = {db_get_city.city_id})",
+            },
+            202,
+        )
 
 
 @app.route("/routes", methods=["GET"])
@@ -524,7 +528,6 @@ def get_trip_connection():
 
     try:
         connections = route_find.find_connection(get_departure_time)
-        # connections = sorted(connections, key= lambda s_t: s_t.departure_time)
     except RuntimeError as error:
         return {"Status": "Failed", "Error": str(error)}, 404
 
@@ -543,5 +546,6 @@ def get_trip_connection():
                 ),
             }
             for stop_time in connections
+            if route_find.find_end_stop(stop_time)
         ],
     }

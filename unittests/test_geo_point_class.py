@@ -19,10 +19,10 @@ class TestGeoPoint(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         """setup objects for class"""
-        cls.geo_point_1 = GeoPoint((51.10881271500856, 17.03415783285653), 1, 15)
-        cls.geo_point_2 = GeoPoint((51.11735339830748, 16.997283957364438), 1, 70)
-        cls.geo_point_3 = GeoPoint((51.09872492804073, 17.036577040546952), 1, 23)
-        cls.geo_point_4 = GeoPoint((51.09872492804073, 17.036577040546952), 1, 300)
+        cls.geo_point_1 = GeoPoint((51.10881271500856, 17.03415783285653), 5, 15)
+        cls.geo_point_2 = GeoPoint((51.11735339830748, 16.997283957364438), 5, 70)
+        cls.geo_point_3 = GeoPoint((51.09872492804073, 17.036577040546952), 5, 23)
+        cls.geo_point_4 = GeoPoint((51.09872492804073, 17.036577040546952), 5, 300)
 
     def test_object_init(self):
         """Checking created GeoPoint type"""

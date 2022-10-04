@@ -16,7 +16,7 @@ class FindRoute:
         self.stops_in_start_range = self.start.distance_to_stops()[:10]
         self.stops_in_end_range = self.end.distance_to_stops()[:10]
 
-    def _direct_trip_lines(self):
+    def _direct_trip_lines(self) -> set[str]:
         """returns set of lines witch allow direct connection between stops"""
 
         lines_in_range = []
@@ -118,4 +118,8 @@ class FindRoute:
                 and next_stop_time.stop.stop_name in stops_to_exit
             )
         ]
-        return exit_stop[0]
+
+        try:
+            return exit_stop[0]
+        except IndexError:
+            return None

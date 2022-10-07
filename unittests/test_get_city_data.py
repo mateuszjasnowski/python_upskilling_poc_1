@@ -44,7 +44,7 @@ class TestFileData(unittest.TestCase):
         self.assertEqual(type(file_data_object.file_content[0]), dict)
         self.assertEqual(len(file_data_object.file_content[0]), 9)
 
-    def test_file_data_set_not_exist(self):
+    def test_file_data_set_not_exist_files(self):
         """Testing behaviour on empty test set"""
         city_dir = self.city_dir + "test_city_0/"
         file_data_object = FileData(city_dir + "feed_info.txt")

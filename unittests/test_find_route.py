@@ -346,3 +346,7 @@ with conditions: city_id = {self.city_id} \
 
         # TEST
         self.assertEqual(self.test_route_2.find_end_stop(stop_time_2), None)
+
+
+if __name__ == "__main__":
+    unittest.main()

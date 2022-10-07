@@ -64,9 +64,9 @@ class FindRoute:
 
     def find_connection(self, departure_time: datetime) -> list[StopTime]:
         """
-        NEED TO BE OPTIMIZED
         returns departures for possible connections
         """
+
         direct_lines = self._direct_trip_lines()
 
         start_nearest_stop = self.stops_in_start_range
@@ -109,6 +109,7 @@ class FindRoute:
 
     def find_end_stop(self, stop_time: StopTime) -> StopTime:
         """returning stop_time for route started at given stop_time"""
+
         stops_to_exit = [stop["stop"].stop_name for stop in self.stops_in_end_range]
         exit_stop = [
             next_stop_time

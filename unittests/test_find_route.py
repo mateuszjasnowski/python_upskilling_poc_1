@@ -3,6 +3,7 @@ Unittests for find_route module
 Testing FindRoute class with all methods
 """
 import unittest
+from datetime import datetime
 
 from sqlalchemy import exc
 
@@ -86,16 +87,22 @@ class TestFindRoute(unittest.TestCase):
 
         if cls.db_connected:
             # points age 23
-            cls.point_1 = GeoPoint((51.119804400436536, 16.99132523967443), 5, 23)
-            cls.point_2 = GeoPoint((51.11161724679465, 17.02185645157625), 5, 23)
+            point_1 = GeoPoint((51.119804400436536, 16.99132523967443), 5, 23)
+            point_2 = GeoPoint((51.11161724679465, 17.02185645157625), 5, 23)
+            print("TEST DEBUG: test_route_1.__init__")
+            cls.test_route_1 = FindRoute(point_1, point_2)
 
             # points age 35
-            cls.point_3 = GeoPoint((51.11710159154701, 17.038304679302943), 5, 35)
-            cls.point_4 = GeoPoint((51.141548149234325, 17.034398121740978), 5, 35)
+            point_3 = GeoPoint((51.11710159154701, 17.038304679302943), 5, 35)
+            point_4 = GeoPoint((51.141548149234325, 17.034398121740978), 5, 35)
+            print("TEST DEBUG: test_route_2.__init__")
+            cls.test_route_2 = FindRoute(point_3, point_4)
 
             # age 75
-            cls.point_5 = GeoPoint((51.11428853446852, 17.04703580165012), 5, 75)
-            cls.point_6 = GeoPoint((51.10935876837617, 17.0351224031273), 5, 75)
+            point_5 = GeoPoint((51.11428853446852, 17.04703580165012), 5, 75)
+            point_6 = GeoPoint((51.10935876837617, 17.0351224031273), 5, 75)
+            print("TEST DEBUG: test_route_3.__init__")
+            cls.test_route_3 = FindRoute(point_5, point_6)
 
     def setUp(self) -> None:
         """Action executed on every test instance"""
@@ -105,5 +112,237 @@ class TestFindRoute(unittest.TestCase):
         # making sure that test_city_3 is in DB
         self.assertTrue(self.test_city_in_db, "Set test_set_3 not in DB")
 
-    def test_test_case(self):
-        pass  # TODO
+    def test_object_init(self):
+        """Testing __init__ method of object"""
+
+        # object type check
+        print("TEST DEBUG: type check")
+        self.assertIsInstance(self.test_route_1, FindRoute)
+        self.assertIsInstance(self.test_route_2, FindRoute)
+        self.assertIsInstance(self.test_route_3, FindRoute)
+
+        # object attributes check
+        print("TEST DEBUG: attributes check")
+        self.assertIsInstance(self.test_route_1.start, GeoPoint)
+        self.assertIsInstance(self.test_route_1.end, GeoPoint)
+        self.assertIsInstance(self.test_route_1.stops_in_start_range, list)
+        self.assertIsInstance(self.test_route_1.stops_in_end_range, list)
+
+        self.assertIsInstance(self.test_route_2.start, GeoPoint)
+        self.assertIsInstance(self.test_route_2.end, GeoPoint)
+        self.assertIsInstance(self.test_route_1.stops_in_start_range, list)
+        self.assertIsInstance(self.test_route_1.stops_in_end_range, list)
+
+        self.assertIsInstance(self.test_route_3.start, GeoPoint)
+        self.assertIsInstance(self.test_route_3.end, GeoPoint)
+        self.assertIsInstance(self.test_route_1.stops_in_start_range, list)
+        self.assertIsInstance(self.test_route_1.stops_in_end_range, list)
+
+        # attributes lenght check
+        print("TEST DEBUG: attributes lenght check")
+        self.assertGreater(len(self.test_route_1.stops_in_start_range), 0)
+        self.assertGreater(len(self.test_route_1.stops_in_end_range), 0)
+
+        self.assertGreater(len(self.test_route_2.stops_in_start_range), 0)
+        self.assertGreater(len(self.test_route_2.stops_in_end_range), 0)
+
+        self.assertEqual(len(self.test_route_3.stops_in_start_range), 0)
+        self.assertEqual(len(self.test_route_3.stops_in_end_range), 0)
+
+    def test_direct_trip_lines_true_scenario(self):
+        """Testing _is_direction_correct local method"""
+        # type check
+        print("TEST DEBUG: type check")
+        self.assertIsInstance(self.test_route_1._direct_trip_lines(), set)
+        self.assertIsInstance(self.test_route_2._direct_trip_lines(), set)
+
+        self.assertIsInstance(list(self.test_route_1._direct_trip_lines())[0], str)
+        self.assertIsInstance(list(self.test_route_2._direct_trip_lines())[0], str)
+
+        # lenght check
+        print("TEST DEBUG: lenght check")
+        self.assertGreater(len(self.test_route_1._direct_trip_lines()), 0)
+        self.assertGreater(len(self.test_route_2._direct_trip_lines()), 0)
+
+    def test_direct_trip_lines_empty_scenario(self):
+        """Testing _is_direction_correct in not found connection scenario"""
+
+        self.assertRaises(RuntimeError, self.test_route_3._direct_trip_lines)
+
+    def test_is_direction_correct(self):
+        """Testing _is_direction_correct method"""
+
+        # test vars
+        # ROUTE 1
+        print("TEST DEBUG: Creating test vars for route_1")
+        stop_time_id_1 = 630362
+        stop_time_1 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_1
+        ).first()
+
+        #!Not test but proper test var confirmation
+        self.assertIsNot(
+            stop_time_1,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_1}",
+        )
+
+        # ROUTE 2
+        print("TEST DEBUG: Creating test vars for route_2")
+        stop_time_id_2 = 671778
+        stop_time_2 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_2
+        ).first()
+
+        #!Not test but proper test var confirmation
+        self.assertIsNot(
+            stop_time_2,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_2}",
+        )
+
+        # TEST
+        print("TEST DEBUG: Testing returned values")
+        self.assertTrue(self.test_route_1._is_direction_correct(stop_time_1))
+        self.assertTrue(self.test_route_2._is_direction_correct(stop_time_2))
+
+    def test_find_connection_correct_scenario(self):
+        """
+        Testing find_connection method
+        Using scenarios for possible connections to found
+        """
+
+        test_date = datetime(2022, 9, 30, 20, 15, 0)
+
+        connection_1 = self.test_route_1.find_connection(test_date)
+        connection_2 = self.test_route_2.find_connection(test_date)
+
+        self.assertIsInstance(connection_1, list)
+        self.assertIsInstance(connection_2, list)
+
+        self.assertGreater(len(connection_1), 0)
+        self.assertGreater(len(connection_2), 0)
+
+        self.assertIsInstance(connection_1[0], city.StopTime)
+        self.assertIsInstance(connection_2[0], city.StopTime)
+
+        if len(connection_1) > 1:
+            self.assertLessEqual(
+                connection_1[0].departure_time, connection_1[1].departure_time
+            )
+
+        if len(connection_2) > 1:
+            self.assertLessEqual(
+                connection_2[0].departure_time, connection_2[1].departure_time
+            )
+
+    def test_find_connection_not_correct_scenario(self):
+        """
+        Testing find_connection method
+        Using scenario where conenction cannot be found
+        """
+
+        test_date = datetime(2022, 9, 30, 20, 15, 0)
+
+        try:
+            connection = self.test_route_3.find_connection(test_date)
+        except Exception as error:
+            self.assertIsInstance(error, RuntimeError)
+        else:
+            self.assertIsInstance(connection, None)
+
+    def test_find_end_stop_correct_scenario(self):
+        """
+        Testing find_end_stop method
+        Passing correct stop_time args
+        """
+
+        # test vars
+        # ROUTE 1
+        print("TEST DEBUG: Creating test vars for route_1")
+        stop_time_id_1 = 630362
+        stop_time_1 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_1
+        ).first()
+
+        #!Not test but proper test var confirmation
+        self.assertIsNot(
+            stop_time_1,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_1}",
+        )
+
+        # ROUTE 2
+        print("TEST DEBUG: Creating test vars for route_2")
+        stop_time_id_2 = 671778
+        stop_time_2 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_2
+        ).first()
+
+        self.assertIsNot(
+            stop_time_2,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_2}",
+        )
+
+        # TEST ACIONS
+        end_stop_1 = self.test_route_1.find_end_stop(stop_time_1)
+
+        self.assertIsInstance(end_stop_1, city.StopTime)
+        self.assertEqual(end_stop_1.stop_time_id, 630366)
+        self.assertEqual(stop_time_1.trip_id, end_stop_1.trip_id)
+
+        end_stop_2 = self.test_route_2.find_end_stop(stop_time_2)
+        self.assertEqual(end_stop_2, None)
+
+    def test_find_end_stop_wrond_scenario(self):
+        """
+        Testing find_end_stop method
+        Passing wrong stop_time args
+        """
+
+        # ROUTE 1
+        print("TEST DEBUG: Creating test vars for route_1")
+        stop_time_id_1 = 614560
+        stop_time_1 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_1
+        ).first()
+
+        #!Not test but proper test var confirmation
+        self.assertIsNot(
+            stop_time_1,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_1}",
+        )
+
+        # TEST
+        self.assertEqual(self.test_route_1.find_end_stop(stop_time_1), None)
+
+        # ROUTE 2
+        print("TEST DEBUG: Creating test vars for route_2")
+        stop_time_id_2 = 668041
+        stop_time_2 = city.StopTime.query.filter_by(
+            city_id=self.city_id, stop_time_id=stop_time_id_2
+        ).first()
+
+        #!Not test but proper test var confirmation
+        self.assertIsNot(
+            stop_time_2,
+            None,
+            f"TEST ERROR: Cannot find StopTime \
+with conditions: city_id = {self.city_id} \
+& stop_time_id = {stop_time_id_2}",
+        )
+
+        # TEST
+        self.assertEqual(self.test_route_2.find_end_stop(stop_time_2), None)

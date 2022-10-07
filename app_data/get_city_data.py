@@ -83,7 +83,11 @@ class CityData:
 
         else:
             # opening files
-            self.file_list = [f for f in listdir(city_dir) if isfile(join(city_dir, f))]
+            self.file_list = [
+                f for f in listdir(city_dir)
+                if (isfile(join(city_dir, f))
+                and f.split('.')[0] != '')
+                ]
 
             if len(self.file_list) == 0:
                 self.errors.append("No files found!")

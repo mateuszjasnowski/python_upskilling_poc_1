@@ -1,10 +1,11 @@
-pip
-black
-pylint
-flask
-flask_sqlalchemy
-psycopg2-binary
-pylint-flask-sqlalchemy
-pylint-flask
-cryptography
-geopy
+pip >= 22.2.2
+black == 22.8.0
+pylint == 2.15.0
+flask == 2.2.2
+flask_sqlalchemy == 1.4.40
+sqlalchemy == 1.4.40
+psycopg2-binary == 2.9.3
+pylint-flask-sqlalchemy == 0.2.0
+pylint-flask == 0.6
+cryptography == 38.0.1
+geopy == 2.2.0

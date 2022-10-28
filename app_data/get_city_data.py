@@ -91,7 +91,7 @@ class CityData:
 
             if len(self.file_list) == 0:
                 self.errors.append("No files found!")
-                self.return_code = 204
+                self.return_code = 404
             else:
                 for file in self.file_list:
                     file_data = FileData(city_dir + file)
